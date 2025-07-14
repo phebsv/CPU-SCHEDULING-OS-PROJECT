@@ -15,6 +15,35 @@ public class Process {
         this.remainingTime = burstTime;
     }
 
+    public String getPid(){ 
+        return pid;
+    }
+    public int getArrivalTime(){
+        return arrivalTime;
+    }
+    public int getBurstTime(){
+        return burstTime;
+    }
+    public intRemainingTime(){
+        return remainingTime;
+    }
+    public int getCompletionTime(){
+        return completionTime;
+    }
+    public int getStartTime(){
+        return startTime;
+    }
+
+    public void setRemainingTime(int remainingTime){
+        this.remainingTime = remainingTime;
+    }
+    public void setCompletionTime(int completionTime){
+        this.completionTime = completionTime;
+    }
+    public void setStartTime(int startTime){
+        this.startTime = startTime;
+    }
+    
     public int getTurnaroundTime(){
         return completionTime - arrivalTime;
     }
