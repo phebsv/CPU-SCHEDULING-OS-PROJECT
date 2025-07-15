@@ -2,6 +2,7 @@ package main;
 import java.util.*;
 
 import schedulers.FCFS;
+import schedulers.SJF;
 
 public class Main{
     public static void main(String[] args){
@@ -43,6 +44,7 @@ public class Main{
         }
         System.out.println("Choose a Scheduling Algorithm");
         System.out.println("1. First Come First Serve(FCFS)");
+        System.out.println("2. Shortest Job First (SJF - Non-Preemptive)");
         System.out.print("Your Choice: ");
         int algoChoice = scanner.nextInt();
 
@@ -51,6 +53,9 @@ public class Main{
         switch(algoChoice){
             case 1 :
             scheduler = new FCFS();
+            break;
+            case 2 :
+            scheduler = new SJF();
             break;
             default: 
                 System.out.println("Invalid Choice");
