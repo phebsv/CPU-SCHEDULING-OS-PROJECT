@@ -62,6 +62,8 @@ public class Main{
                 System.exit(0);
         }
         
+
+        scheduler.schedule(processes);
         scanner.close();
     }
 }
