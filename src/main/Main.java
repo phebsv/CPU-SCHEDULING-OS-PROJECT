@@ -1,6 +1,8 @@
 package main;
 import java.util.*;
 
+import schedulers.FCFS;
+
 public class Main{
     public static void main(String[] args){
         Scanner scanner = new Scanner (System.in);
@@ -39,5 +41,22 @@ public class Main{
                 System.out.println(p.getPid() + " - Arrival: " + p.getArrivalTime()+ ", Burst: " + p.getBurstTime());
             }
         }
+        System.out.println("Choose a Scheduling Algorithm");
+        System.out.println("1. First Come First Serve(FCFS)");
+        System.out.print("Your Choice: ");
+        int algoChoice = scanner.nextInt();
+
+        Scheduler scheduler = null;
+
+        switch(algoChoice){
+            case 1 :
+            scheduler = new FCFS();
+            break;
+            default: 
+                System.out.println("Invalid Choice");
+                System.exit(0);
+        }
+        
+        scanner.close();
     }
 }
