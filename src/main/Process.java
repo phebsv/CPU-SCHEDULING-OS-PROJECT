@@ -24,7 +24,7 @@ public class Process {
     public int getBurstTime(){
         return burstTime;
     }
-    public intRemainingTime(){
+    public int RemainingTime(){
         return remainingTime;
     }
     public int getCompletionTime(){
