@@ -16,7 +16,7 @@ public class SRTF implements Scheduler {
         int n = allProcesses.size();
 
         while (completedCount < n) {
-            (Iterator<Process> it = allProcesses.iterator(); 
+            Iterator<Process> it = allProcesses.iterator(); 
             while (it.hasNext()){
                 Process p = it.next();
                 if (p.getArrivalTime() <= currentTime){

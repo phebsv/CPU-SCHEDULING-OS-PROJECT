@@ -46,6 +46,9 @@ public class Process {
     public void setStartTime(int startTime){
         this.startTime = startTime;
     }
+    public void setArrivalTime(int arrivalTime){
+        this.arrivalTime = arrivalTime;
+    }
     
     public int getTurnaroundTime(){
         return completionTime - arrivalTime;
