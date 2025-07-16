@@ -3,6 +3,8 @@ import java.util.*;
 import schedulers.FCFS;
 import schedulers.SJF;
 import schedulers.SRTF;
+import schedulers.RoundRobin;
+
 
 public class Main{
     public static void main(String[] args){
@@ -11,7 +13,7 @@ public class Main{
             System.out.println("------------------------------------------");
             System.out.println("1. Input manually");
             System.out.println("2. Generate randomly");
-            System.out.println("Select input method: ");
+            System.out.print("Select input method: ");
             int inputChoice = scanner.nextInt();
 
             List<Process> processes = new ArrayList<>();
@@ -45,6 +47,7 @@ public class Main{
             System.out.println("1. First Come First Serve(FCFS)");
             System.out.println("2. Shortest Job First (SJF - Non-Preemptive)");
             System.out.println("3. Shortest Remaining Time First (SRTF)");
+            System.out.println("4. Round Robin(RR)");
             System.out.print("Your Choice: ");
             int algoChoice = scanner.nextInt();
 
@@ -52,6 +55,11 @@ public class Main{
                 case 1 -> new FCFS();
                 case 2 -> new SJF();
                 case 3 -> new SRTF();
+                case 4 -> {
+                    System.out.println("Enter time quantum: ");
+                    int quantum = scanner.nextInt();
+                    yield new RoundRobin(quantum);
+                }
                 default -> throw new IllegalArgumentException("Invalid Choice");
             };
             
