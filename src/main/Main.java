@@ -2,6 +2,7 @@ package main;
 import java.util.*;
 import schedulers.FCFS;
 import schedulers.SJF;
+import schedulers.SRTF;
 
 public class Main{
     public static void main(String[] args){
@@ -43,12 +44,14 @@ public class Main{
             System.out.println("Choose a Scheduling Algorithm");
             System.out.println("1. First Come First Serve(FCFS)");
             System.out.println("2. Shortest Job First (SJF - Non-Preemptive)");
+            System.out.println("3. Shortest Remaining Time First (SRTF)");
             System.out.print("Your Choice: ");
             int algoChoice = scanner.nextInt();
 
             Scheduler scheduler = switch(algoChoice){
                 case 1 -> new FCFS();
                 case 2 -> new SJF();
+                case 3 -> new SRTF();
                 default -> throw new IllegalArgumentException("Invalid Choice");
             };
             
