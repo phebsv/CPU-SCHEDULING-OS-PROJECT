@@ -24,7 +24,7 @@ public class Process {
     public int getBurstTime(){
         return burstTime;
     }
-    public int RemainingTime(){
+    public int getRemainingTime(){
         return remainingTime;
     }
     public int getCompletionTime(){
@@ -32,9 +32,6 @@ public class Process {
     }
     public int getStartTime(){
         return startTime;
-    }
-    public int getRemainingTime(){
-        return remainingTime;
     }
 
     public void setRemainingTime(int remainingTime){
