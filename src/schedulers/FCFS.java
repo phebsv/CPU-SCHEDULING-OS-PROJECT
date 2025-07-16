@@ -1,12 +1,12 @@
 package schedulers;
-import main.Process;
-import main.Scheduler;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import main.Process;
+import main.Scheduler;
 
 public class FCFS implements Scheduler{
+    @Override
     public List<Process> schedule(List<Process> processes){
 
         processes.sort(Comparator.comparingInt(Process::getArrivalTime));
