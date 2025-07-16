@@ -49,46 +49,6 @@ public class SJF implements Scheduler {
 
     }
 
-    private void printGanttChart(List<Process> processes){
-        System.out.println("\nGantt Chart: ");
-        System.out.print("|");
-        for(Process p : processes){
-            System.out.println(" " + p.getPid() + " |");
-
-        }
-        System.out.println();
-
-        int time = 0;
-        System.out.print("0");
-        for (Process p : processes){
-            time = p.getCompletionTime();
-            System.out.println("   "+ time);
-        }
-        System.out.println("\n");
-    }
-
-    private void printMetrics(List<Process> processes){
-
-        double totalTAT = 0;
-        double totalRT = 0;
-
-        System.out.println("PID\tBT\tCT\tTAT\tRT");
-        for(Process p : processes){
-            int at = p.getArrivalTime();
-            int bt = p.getBurstTime();
-            int ct = p.getCompletionTime();
-            int tat = p.getTurnaroundTime();
-            int rt = p.getResponseTime();
-
-            totalTAT += tat;
-            totalRT += rt;
-
-            System.out.printf("%s\t%d\t%d\t%d\t%d\t%d\n", p.getPid(), at, bt, ct, tat, rt);
-        }
-
-        System.out.printf("\nAverage Turnaround Time: %.2f\n", totalTAT / processes.size());
-        System.out.printf("Average Response Time: %.2f\n", totalRT / processes.size());
-    }
-
+    
 
 }
