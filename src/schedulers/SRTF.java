@@ -1,10 +1,12 @@
 package schedulers;
+import java.util.*;
 
 import main.Process;
 import main.Scheduler;
-import java.util.*;
 
-public class SRTF implements Scheduler { 
+
+public class SRTF implements Scheduler {
+
     @Override
     public List<Process> schedule(List<Process> processes){
         List<Process> allProcesses = new ArrayList<>(processes);
@@ -13,7 +15,7 @@ public class SRTF implements Scheduler {
 
         int currentTime = 0;
         int completedCount = 0;
-        int n = allProcesses.size();
+        int n = processes.size();
 
         while (completedCount < n) {
             Iterator<Process> it = allProcesses.iterator(); 
