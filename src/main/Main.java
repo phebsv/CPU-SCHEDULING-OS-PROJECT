@@ -67,8 +67,26 @@ public class Main{
                 time = p.getCompletionTime();
                 System.out.print("   " + time);
             }
-        }
 
         System.out.println();
+
+        double totalTAT=0;
+        double totalRT=0;
+
+        System.out.println("Process\tAT\tBT\tST\tCT\tTAT\tRT");
+        for (Process p : scheduled){
+            int tat= p.getTurnaroundTime();
+            int rt= p.getResponseTime();
+            totalTAT += tat;
+            totalRT += rt;
+
+            System.out.println(p.getPid() + "\t" +p.getArrivalTime() + "\t" + p.getBurstTime() +"\t"
+            + p.getStartTime() + "\t" + p.getCompletionTime() + "\t" + tat + "\t" +rt);
+        }
+
+        int n = scheduled.size();
+        System.out.printf("Average Turnaround time: %.2f", totalTAT / n);
+        System.out.printf("Average Response Time: %.2f", totalRT / n);
     }
+}
 }
