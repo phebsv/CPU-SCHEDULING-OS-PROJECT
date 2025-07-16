@@ -45,9 +45,6 @@ public class SJF implements Scheduler {
         }
 
 
-        printGanttChart(completedProcesses);
-        printMetrics(completedProcesses);
-
         return completedProcesses;
 
     }
