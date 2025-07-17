@@ -6,7 +6,6 @@ import schedulers.SJF;
 import schedulers.SRTF;
 
 
-
 public class Main{
     public static void main(String[] args){
         try (Scanner scanner = new Scanner (System.in)) {
@@ -49,6 +48,7 @@ public class Main{
             System.out.println("2. Shortest Job First (SJF - Non-Preemptive)");
             System.out.println("3. Shortest Remaining Time First (SRTF)");
             System.out.println("4. Round Robin(RR)");
+            System.out.println("5. Multi-level Feedback Queue (MLFQ)");
             System.out.print("Your Choice: ");
             int algoChoice = scanner.nextInt();
 
@@ -60,6 +60,19 @@ public class Main{
                     System.out.println("Enter time quantum: ");
                     int quantum = scanner.nextInt();
                     yield new RoundRobin(quantum);
+                }
+                case 5 -> {
+                    int levels = 4;
+                    int [] timeQuanta = new int[levels];
+                    int [] allotmentTimes = new int[levels];
+                    System.out.println("Enter time quantum and allotment time for each level: ");
+                    for (int i =0; i < levels; i++) {
+                        System.out.printf("Q%d time quantum: ", i);
+                        timeQuanta[i] = scanner.nextInt();
+                        System.out.printf("Q%d allotment time: ", i);
+                        allotmentTimes[i] = scanner.nextInt();
+                    }
+                    yield new schedulers.MLFQ(timeQuanta, allotmentTimes);
                 }
                 default -> throw new IllegalArgumentException("Invalid Choice");
             };
