@@ -6,10 +6,10 @@ import main.Scheduler;
 public class MLFQ implements Scheduler {
 
     public static class GanttEntry {
-    String pid;
-    int queueLevel;
-    int startTime;
-    int endTime;
+    public String pid;
+    public int queueLevel;
+    public int startTime;
+    public int endTime;
 
     public GanttEntry(String pid, int queueLevel, int startTime, int endTime) {
         this.pid = pid;
@@ -21,8 +21,8 @@ public class MLFQ implements Scheduler {
 
     private final int[] timeQuantums;
     private final int[] allotmentTimes;
-    private List<GanttEntry> ganttEntries = new ArrayList<>();
-    
+    public List<GanttEntry> ganttEntries = new ArrayList<>();
+
     public List<GanttEntry> getGanttEntries(){
         return ganttEntries;
     }
