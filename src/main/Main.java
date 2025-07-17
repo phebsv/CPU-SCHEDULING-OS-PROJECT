@@ -84,9 +84,17 @@ public class Main{
             System.out.println("Gantt Chart");
             if (algoChoice == 5 && scheduler instanceof MLFQ mlfqScheduler) {
                 List<MLFQ.GanttEntry> entries = mlfqScheduler.getGanttEntries();
-                System.out.println("|");
-                for (MLFQ.GanttEntry entry : entries) {
-                    System.out.print("| " + entry.pid + "(Q" + entry.queueLevel + ") ");
+               
+                if (entries.isEmpty()){
+                    System.out.println("No Gantt Entries to display.");
+                }else{
+                    System.out.println("|");
+                    for (MLFQ.GanttEntry entry : entries) {
+                        if(entry.queueLevel == -1){
+                            System.out.print("| IDLE");
+                        } else {
+                            System.out.print("| " + entry.pid + "(Q" + entry.queueLevel + ") ");
+                        }
                 }
                 System.out.println();
 
@@ -94,7 +102,8 @@ public class Main{
                     System.out.print(entry.startTime + "\t");
                 }
                 System.out.println(entries.get(entries.size() - 1).endTime);
-            } else {
+            } 
+        } else {
                 int currentTime = 0;
                 for (Process p : scheduled) {
                     System.out.print("| " + p.getPid() + " ");
