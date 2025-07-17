@@ -5,8 +5,27 @@ import main.Scheduler;
 
 public class MLFQ implements Scheduler {
 
+    public static class GanttEntry {
+    String pid;
+    int queueLevel;
+    int startTime;
+    int endTime;
+
+    public GanttEntry(String pid, int queueLevel, int startTime, int endTime) {
+        this.pid = pid;
+        this.queueLevel = queueLevel;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+}
+
     private final int[] timeQuantums;
     private final int[] allotmentTimes;
+    private List<GanttEntry> ganttEntries = new ArrayList<>();
+    
+    public List<GanttEntry> getGanttEntries(){
+        return ganttEntries;
+    }
 
     public MLFQ(int[] timeQuantums, int[] allotmentTimes) {
         this.timeQuantums = timeQuantums;
@@ -34,6 +53,7 @@ public class MLFQ implements Scheduler {
         Map<String, Integer> timeUsedAtLevel = new HashMap<>();
 
         allProcesses.sort(Comparator.comparingInt(Process::getArrivalTime));
+        ganttEntries.clear();
 
         while (completed < n) {
             for (Process p : allProcesses) {
@@ -82,6 +102,8 @@ public class MLFQ implements Scheduler {
                             break;
                         }
                     }
+
+                    ganttEntries.add(new GanttEntry(current.getPid(), level, startRunTime, currentTime));
 
                     int used = timeUsedAtLevel.getOrDefault(current.getPid(), 0);
                     timeUsedAtLevel.put(current.getPid(), used + runTime);
