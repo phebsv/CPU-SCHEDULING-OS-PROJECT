@@ -1,13 +1,13 @@
 package schedulers;
+import java.util.*;
 import main.Process;
 import main.Scheduler;
-
-import java.util.*;
 
 
 public class RoundRobin implements Scheduler {
 
     private final int quantum;
+    private final List<Process> executionOrder = new ArrayList<>();
 
     public RoundRobin(int quantum){
         this.quantum = quantum;
@@ -18,16 +18,13 @@ public class RoundRobin implements Scheduler {
         List<Process> allProcesses = new ArrayList<>(processes);
         List<Process> completedProcesses = new ArrayList<>();
         Queue<Process> queue = new LinkedList<>();
-        List<Process> executionOrder = new ArrayList<>();
+        Set<String> inQueue = new HashSet<>();
 
         int currentTime= 0;
         int completed = 0;
         int n = allProcesses.size();
 
         allProcesses.sort(Comparator.comparingInt(Process::getArrivalTime));
-
-        Set<String> inQueue = new HashSet<>();
-
 
         while (completed<n) {
 
@@ -49,40 +46,40 @@ public class RoundRobin implements Scheduler {
             if (current.getStartTime() == -1) {
                 current.setStartTime(currentTime);
             }
-            Process exec = new Process(current.getPid(), current.getArrivalTime(), current.getBurstTime());
-            exec.setStartTime(currentTime);
-            executionOrder.add(exec);
-            
 
             int executeTime = Math.min(quantum, current.getRemainingTime());
+
+            Process exec = new Process(current.getPid(), current.getArrivalTime(), current.getBurstTime());
+            exec.setStartTime(currentTime);
+            exec.setCompletionTime(currentTime + executeTime);
+            executionOrder.add(exec);
+            
             currentTime += executeTime;
             current.setRemainingTime(current.getRemainingTime() - executeTime);
+
+            for (Process p : allProcesses){
+                if (p.getArrivalTime() <= currentTime && p.getRemainingTime() > 0 && !inQueue.contains(p.getPid())){
+                    queue.offer(p);
+                    inQueue.add(p.getPid());
+                    }
+                }
 
             if (current.getRemainingTime() == 0){
                 current.setCompletionTime(currentTime);
                 completedProcesses.add(current);
                 completed++;
             }else {
-                
-                for (Process p : allProcesses){
-                    if (p.getArrivalTime() <= currentTime && p.getRemainingTime() > 0 && !inQueue.contains(p.getPid())){
-                        queue.offer(p);
-                        inQueue.add(p.getPid());
-                    }
-                }
-
                 queue.offer(current);
                 inQueue.add(current.getPid());
             }
-          
-         }
+        }
 
-         return completedProcesses;
-
+        return completedProcesses;
     }
-
-
- }
+    public List<Process> getExecutionOrder(){
+        return executionOrder;
+    }
+}
 
 
 
