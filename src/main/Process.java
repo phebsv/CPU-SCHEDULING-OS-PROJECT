@@ -7,6 +7,7 @@ public class Process {
     int remainingTime;
     int completionTime;
     int startTime = -1;
+    int queueLevel = -1;
 
     public Process(String pid, int arrivalTime, int burstTime){
         this.pid = pid;
@@ -33,6 +34,9 @@ public class Process {
     public int getStartTime(){
         return startTime;
     }
+    public int getQueueLevel(){
+        return queueLevel;
+    }
 
     public void setRemainingTime(int remainingTime){
         this.remainingTime = remainingTime;
@@ -45,6 +49,9 @@ public class Process {
     }
     public void setArrivalTime(int arrivalTime){
         this.arrivalTime = arrivalTime;
+    }
+    public void setQueueLevel(int level){
+        this.queueLevel = level;
     }
     
     public int getTurnaroundTime(){

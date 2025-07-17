@@ -82,7 +82,11 @@ public class Main{
             
             System.out.println("Gantt Chart");
             for (Process p : scheduled){
-                System.out.print("| " + p.getPid()+" ");
+                if (algoChoice==5){
+                    System.out.print("|" + p.getPid() + "(Q" + p.getQueueLevel() + ") ");
+                } else {
+                    System.out.print("| " + p.getPid()+" ");
+                }
             }
             System.out.println("|");
 

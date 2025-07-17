@@ -52,6 +52,7 @@ public class MLFQ implements Scheduler {
                 if (!queue.isEmpty()) {
                     Process current = queue.poll();
                     inQueue.remove(current.getPid());
+                    current.setQueueLevel(level);
 
                     if (current.getStartTime() == -1) {
                         current.setStartTime(currentTime);
