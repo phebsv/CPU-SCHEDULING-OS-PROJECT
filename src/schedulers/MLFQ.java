@@ -101,8 +101,10 @@ public class MLFQ implements Scheduler {
                         }
                     }
 
+                    if (startRunTime < currentTime){
                     ganttEntries.add(new GanttEntry(current.getPid(), level, startRunTime, currentTime));
-
+                    }
+                    
                     int used = timeUsedAtLevel.getOrDefault(current.getPid(), 0);
                     timeUsedAtLevel.put(current.getPid(), used + runTime);
 
@@ -129,7 +131,7 @@ public class MLFQ implements Scheduler {
             }
         }
 
-        ganttEntries.clear();
+        //ganttEntries.clear();
 
         return completedProcesses;
     }

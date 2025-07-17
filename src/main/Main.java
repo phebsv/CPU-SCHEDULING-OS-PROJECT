@@ -84,7 +84,7 @@ public class Main{
             System.out.println("Gantt Chart");
             if (algoChoice == 5 && scheduler instanceof MLFQ mlfqScheduler) {
                 List<MLFQ.GanttEntry> entries = mlfqScheduler.getGanttEntries();
-               
+
                 if (entries.isEmpty()){
                     System.out.println("No Gantt Entries to display.");
                 }else{
@@ -102,7 +102,7 @@ public class Main{
                     System.out.print(entry.startTime + "\t");
                 }
                 System.out.println(entries.get(entries.size() - 1).endTime);
-            } 
+            }
         } else {
                 int currentTime = 0;
                 for (Process p : scheduled) {
