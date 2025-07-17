@@ -24,7 +24,7 @@ public class Main{
                 int n = scanner.nextInt();
                 for (int i=0; i<n; i++){
                     System.out.println("Process P" + (i+1));
-                    System.out.println("Arrival Time: ");
+                    System.out.print("Arrival Time: ");
                     int at = scanner.nextInt();
                     System.out.print("Burst Time: ");
                     int bt = scanner.nextInt();
@@ -84,38 +84,36 @@ public class Main{
             System.out.println("Gantt Chart");
             if (algoChoice == 5 && scheduler instanceof MLFQ mlfqScheduler) {
                 List<MLFQ.GanttEntry> entries = mlfqScheduler.getGanttEntries();
+                System.out.println("|");
                 for (MLFQ.GanttEntry entry : entries) {
                     System.out.print("| " + entry.pid + "(Q" + entry.queueLevel + ") ");
                 }
-                System.out.println("|");
+                System.out.println();
 
                 for (MLFQ.GanttEntry entry : entries) {
-                    System.out.print(entry.startTime + "      ");
+                    System.out.print(entry.startTime + "\t");
                 }
                 System.out.println(entries.get(entries.size() - 1).endTime);
             } else {
+                int currentTime = 0;
                 for (Process p : scheduled) {
                     System.out.print("| " + p.getPid() + " ");
                 }
-            }
-            System.out.println("|");
+                System.out.println("|");
 
-            int time = scheduled.get(0).getStartTime();
-            System.out.print(time);
-            for(Process p:scheduled){
-                time = p.getCompletionTime();
-                System.out.print("   " + time);
+                for (Process p : scheduled) {
+                    System.out.print(p.getStartTime()+ "\t");
+                }
+                System.out.println(scheduled.get(scheduled.size() - 1).getCompletionTime());
             }
 
-        System.out.println();
-
+        System.out.println("Process\tAT\tBT\tST\tCT\tTAT\tRT");
         double totalTAT=0;
         double totalRT=0;
 
-        System.out.println("Process\tAT\tBT\tST\tCT\tTAT\tRT");
         for (Process p : scheduled){
-            int tat= p.getTurnaroundTime();
-            int rt= p.getResponseTime();
+            int tat= p.getCompletionTime() - p.getArrivalTime();
+            int rt= p.getStartTime() - p.getArrivalTime();
             totalTAT += tat;
             totalRT += rt;
 
@@ -123,9 +121,8 @@ public class Main{
             + p.getStartTime() + "\t" + p.getCompletionTime() + "\t" + tat + "\t" +rt);
         }
 
-        int n = scheduled.size();
-        System.out.printf("Average Turnaround time: %.2f", totalTAT / n);
-        System.out.printf("Average Response Time: %.2f", totalRT / n);
+        System.out.printf("Average Turnaround time: %.2f", totalTAT / scheduled.size());
+        System.out.printf("Average Response Time: %.2f", totalRT / scheduled.size());
     }
 }
 }
