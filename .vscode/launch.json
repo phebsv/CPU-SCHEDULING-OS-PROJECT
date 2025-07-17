@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "MainGUI",
+      "request": "launch",
+      "mainClass": "GUI.MainGUI",
+      "projectName": "CPU-SCHEDULING-OS-PROJECT_59a2360a"
+    },
+    {
+      "type": "java",
+      "name": "Launch JavaFX GUI",
+      "request": "launch",
+      "mainClass": "GUI.MainGUI",
+      "projectName": "CPU-SCHEDULING-OS-PROJECT",
+      "vmArgs": "--module-path \"C:\\RSELDON\\openjfx-21.0.8_windows-x64_bin-sdk\\javafx-sdk-21.0.8\\lib\" --add-modules javafx.controls,javafx.fxml"
+    }
+  ]
+}
