@@ -1,96 +1,88 @@
 package schedulers;
+
 import java.util.*;
 import main.Process;
 import main.Scheduler;
-
 
 public class RoundRobin implements Scheduler {
 
     private final int quantum;
     private final List<Process> executionOrder = new ArrayList<>();
 
-    public RoundRobin(int quantum){
+    public RoundRobin(int quantum) {
         this.quantum = quantum;
     }
 
     @Override
-    public List<Process> schedule(List<Process> processes){
+    public List<Process> schedule(List<Process> processes) {
         List<Process> allProcesses = new ArrayList<>();
-        for (Process p : processes){
+        for (Process p : processes) {
             Process copy = new Process(p.getPid(), p.getArrivalTime(), p.getBurstTime());
             allProcesses.add(copy);
         }
 
-        List<Process> completedProcesses = new ArrayList<>();
-        Queue<Process> queue = new LinkedList<>();
-        Set<String> inQueue = new HashSet<>();
-
-        int currentTime= 0;
-        int completed = 0;
-        int n = allProcesses.size();
-
         allProcesses.sort(Comparator.comparingInt(Process::getArrivalTime));
+        Queue<Process> readyQueue = new LinkedList<>();
+        int currentTime = 0, completed = 0;
+        Set<String> inQueue = new HashSet<>();
+        List<Process> completedProcesses = new ArrayList<>();
 
-        while (completed<n) {
+        while (completed < allProcesses.size()) {
 
             for (Process p : allProcesses) {
-                if (p.getArrivalTime() <= currentTime && p.getRemainingTime() > 0 && !inQueue.contains(p.getPid())){
-                    queue.offer(p);
+                if (p.getArrivalTime() <= currentTime && p.getRemainingTime() > 0 && !inQueue.contains(p.getPid())) {
+                    readyQueue.offer(p);
                     inQueue.add(p.getPid());
                 }
             }
 
-            if (queue.isEmpty()){
+            if (readyQueue.isEmpty()) {
                 currentTime++;
                 continue;
             }
-            
-            Process current = queue.poll();
+
+            Process current = readyQueue.poll();
             inQueue.remove(current.getPid());
 
             if (current.getStartTime() == -1) {
                 current.setStartTime(currentTime);
             }
 
-            int executeTime = Math.min(quantum, current.getRemainingTime());
+            int timeSlice = Math.min(quantum, current.getRemainingTime());
+            int start = currentTime;
+            int end = currentTime + timeSlice;
 
-            Process exec = new Process(current.getPid(), current.getArrivalTime(), current.getBurstTime());
-            exec.setStartTime(currentTime);
-            exec.setCompletionTime(currentTime + executeTime);
-            executionOrder.add(exec);
-            
-            currentTime += executeTime;
-            current.setRemainingTime(current.getRemainingTime() - executeTime);
+            Process execSegment = new Process(current.getPid(), current.getArrivalTime(), current.getBurstTime());
+            execSegment.setStartTime(start);
+            execSegment.setCompletionTime(end);
+            executionOrder.add(execSegment);
 
-            for (Process p : allProcesses){
-                if (p.getArrivalTime() <= currentTime && p.getRemainingTime() > 0 && !inQueue.contains(p.getPid())){
-                    queue.offer(p);
+            currentTime += timeSlice;
+            current.setRemainingTime(current.getRemainingTime() - timeSlice);
+
+            for (Process p : allProcesses) {
+                if (p.getArrivalTime() <= currentTime && p.getRemainingTime() > 0 && !inQueue.contains(p.getPid())) {
+                    readyQueue.offer(p);
                     inQueue.add(p.getPid());
-                    }
                 }
+            }
 
-            if (current.getRemainingTime() == 0){
+            if (current.getRemainingTime() == 0) {
                 current.setCompletionTime(currentTime);
+                current.setTurnaroundTime(current.getCompletionTime() - current.getArrivalTime());
+                current.setResponseTime(current.getStartTime() - current.getArrivalTime());
                 completedProcesses.add(current);
                 completed++;
-            }else {
-                queue.offer(current);
+            } else {
+                readyQueue.offer(current);
                 inQueue.add(current.getPid());
             }
         }
 
-        for (Process p : completedProcesses) {
-            p.setTurnaroundTime(p.getCompletionTime() - p.getArrivalTime());
-            p.setResponseTime(p.getStartTime() - p.getArrivalTime());
-        }
-
         return completedProcesses;
     }
-    
-    public List<Process> getExecutionOrder(){
+
+    public List<Process> getExecutionOrder() {
         return executionOrder;
     }
 }
-
-
-

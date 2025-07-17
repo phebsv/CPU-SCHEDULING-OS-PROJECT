@@ -1,6 +1,9 @@
 package GUI;
 
 import javafx.application.Application;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.*;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -17,7 +20,8 @@ public class MainGUI extends Application {
     private TextArea outputArea;
     private TextField arrivalInput, burstInput, numInput, quantumInput;
     private ComboBox<String> algorithmChoice;
-    private List<Process> processes = new ArrayList<>();
+    private ObservableList<Process> processes = FXCollections.observableArrayList();
+    private TableView<Process> processTable;
 
     @Override
     public void start(Stage primaryStage) {
@@ -28,13 +32,13 @@ public class MainGUI extends Application {
 
         numInput = new TextField();
         numInput.setPromptText("e.g., 5");
-
         HBox numBox = new HBox(10, new Label("Number of Processes:"), numInput);
         root.getChildren().add(numBox);
 
         algorithmChoice = new ComboBox<>();
         algorithmChoice.getItems().addAll("FCFS", "SJF", "SRTF", "Round Robin", "MLFQ");
         algorithmChoice.setValue("FCFS");
+        algorithmChoice.setOnAction(e -> toggleQuantumField());
         root.getChildren().add(new HBox(10, new Label("Algorithm:"), algorithmChoice));
 
         quantumInput = new TextField();
@@ -42,24 +46,75 @@ public class MainGUI extends Application {
         HBox quantumBox = new HBox(10, new Label("Quantum (RR/MLFQ):"), quantumInput);
         root.getChildren().add(quantumBox);
 
-        Button generateBtn = new Button("Generate Processes Randomly");
+        // Manual input fields
+        arrivalInput = new TextField();
+        arrivalInput.setPromptText("Arrival Time");
+
+        burstInput = new TextField();
+        burstInput.setPromptText("Burst Time");
+
+        Button addManualBtn = new Button("Add Process");
+        addManualBtn.setOnAction(e -> addManualProcess());
+
+        HBox manualBox = new HBox(10, new Label("Manual Input:"), arrivalInput, burstInput, addManualBtn);
+        root.getChildren().add(manualBox);
+
+        // TableView for processes
+        processTable = new TableView<>();
+        processTable.setItems(processes);
+        processTable.setPrefHeight(200);
+        TableColumn<Process, String> pidCol = new TableColumn<>("PID");
+        pidCol.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getPid()));
+        TableColumn<Process, Integer> atCol = new TableColumn<>("Arrival");
+        atCol.setCellValueFactory(p -> new SimpleIntegerProperty(p.getValue().getArrivalTime()).asObject());
+        TableColumn<Process, Integer> btCol = new TableColumn<>("Burst");
+        btCol.setCellValueFactory(p -> new SimpleIntegerProperty(p.getValue().getBurstTime()).asObject());
+        processTable.getColumns().addAll(pidCol, atCol, btCol);
+        root.getChildren().add(processTable);
+
+        Button generateBtn = new Button("Generate Random");
         generateBtn.setOnAction(e -> generateRandomProcesses());
-        root.getChildren().add(generateBtn);
 
         Button runBtn = new Button("Run Scheduler");
         runBtn.setOnAction(e -> runScheduler());
-        root.getChildren().add(runBtn);
+
+        Button clearBtn = new Button("Clear All");
+        clearBtn.setOnAction(e -> clearAll());
+
+        HBox buttonBox = new HBox(10, generateBtn, runBtn, clearBtn);
+        root.getChildren().add(buttonBox);
 
         outputArea = new TextArea();
         outputArea.setEditable(false);
         outputArea.setPrefHeight(300);
         root.getChildren().add(outputArea);
 
-        Scene scene = new Scene(root, 600, 500);
+        Scene scene = new Scene(root, 900, 700);
         scene.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
-
         primaryStage.setScene(scene);
         primaryStage.show();
+
+        toggleQuantumField(); // initial state
+    }
+
+    private void toggleQuantumField() {
+        String algo = algorithmChoice.getValue();
+        boolean showQuantum = algo.equals("Round Robin") || algo.equals("MLFQ");
+        quantumInput.setDisable(!showQuantum);
+    }
+
+    private void addManualProcess() {
+        try {
+            int at = Integer.parseInt(arrivalInput.getText());
+            int bt = Integer.parseInt(burstInput.getText());
+            String pid = "P" + (processes.size() + 1);
+            Process p = new Process(pid, at, bt);
+            processes.add(p);
+            arrivalInput.clear();
+            burstInput.clear();
+        } catch (NumberFormatException e) {
+            outputArea.appendText("Invalid input for arrival or burst time.\n");
+        }
     }
 
     private void generateRandomProcesses() {
@@ -79,16 +134,11 @@ public class MainGUI extends Application {
             int bt = rand.nextInt(5) + 1;
             processes.add(new Process("P" + (i + 1), at, bt));
         }
-
-        outputArea.appendText("Generated Processes:\n");
-        for (Process p : processes) {
-            outputArea.appendText(p.getPid() + " - Arrival: " + p.getArrivalTime() + ", Burst: " + p.getBurstTime() + "\n");
-        }
     }
 
     private void runScheduler() {
         if (processes.isEmpty()) {
-            outputArea.appendText("No processes to schedule. Generate first.\n");
+            outputArea.appendText("No processes to schedule.\n");
             return;
         }
 
@@ -104,18 +154,18 @@ public class MainGUI extends Application {
                 try {
                     q = Integer.parseInt(quantumInput.getText());
                 } catch (Exception e) {
-                    outputArea.appendText("\nInvalid quantum.\n");
+                    outputArea.appendText("Invalid quantum value.\n");
                     return;
                 }
                 scheduler = new RoundRobin(q);
             }
             case "MLFQ" -> {
-                int[] tq = {2, 4, 8, 16};
-                int[] at = {4, 8, 16, 32};
+                int[] tq = {2, 4, 8};
+                int[] at = {4, 8, 16};
                 scheduler = new MLFQ(tq, at);
             }
             default -> {
-                outputArea.appendText("\nInvalid Algorithm.\n");
+                outputArea.appendText("Unknown Algorithm.\n");
                 return;
             }
         }
@@ -126,9 +176,7 @@ public class MainGUI extends Application {
 
     private void displayResults(List<Process> scheduled) {
         outputArea.appendText("\nGantt Chart:\n");
-        for (Process p : scheduled) {
-            outputArea.appendText("| " + p.getPid() + " ");
-        }
+        for (Process p : scheduled) outputArea.appendText("| " + p.getPid() + " ");
         outputArea.appendText("|\n");
 
         int time = scheduled.get(0).getStartTime();
@@ -146,7 +194,6 @@ public class MainGUI extends Application {
             int rt = p.getResponseTime();
             totalTAT += tat;
             totalRT += rt;
-
             outputArea.appendText(p.getPid() + "\t" + p.getArrivalTime() + "\t" + p.getBurstTime() + "\t" +
                     p.getStartTime() + "\t" + p.getCompletionTime() + "\t" + tat + "\t" + rt + "\n");
         }
@@ -154,6 +201,15 @@ public class MainGUI extends Application {
         int n = scheduled.size();
         outputArea.appendText(String.format("\nAverage Turnaround Time: %.2f\n", totalTAT / n));
         outputArea.appendText(String.format("Average Response Time: %.2f\n", totalRT / n));
+    }
+
+    private void clearAll() {
+        processes.clear();
+        arrivalInput.clear();
+        burstInput.clear();
+        numInput.clear();
+        quantumInput.clear();
+        outputArea.clear();
     }
 
     public static void main(String[] args) {
