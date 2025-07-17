@@ -102,24 +102,25 @@ public class Main{
                     System.out.print(entry.startTime + "\t");
                 }
                 System.out.println(entries.get(entries.size() - 1).endTime);
-            } 
+            }
         } else if (algoChoice == 4 && scheduler instanceof RoundRobin rrScheduler) {
                 List<Process> execOrder = rrScheduler.getExecutionOrder();
 
                 if (execOrder.isEmpty()) {
-                    System.out.println("No Gantt Entries to display.");
+                    System.out.println("No execution to display.");
                 } else {
-                    System.out.println("|");
+                    int time = 0;
                     for (Process p : execOrder) {
                         System.out.print("| " + p.getPid() + " ");
                     }
                     System.out.println("|");
 
+                    System.out.print(execOrder.get(0).getStartTime());
                     for (Process p : execOrder) {
-                        System.out.print(p.getStartTime() + "\t");
+                        System.out.print("   " + p.getCompletionTime());
                     }
-                    System.out.println(execOrder.get(execOrder.size() - 1).getCompletionTime());
-            } 
+                    System.out.println();
+            }
         } else {
                 int currentTime = 0;
                 for (Process p : scheduled) {

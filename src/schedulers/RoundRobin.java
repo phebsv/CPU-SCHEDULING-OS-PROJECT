@@ -15,7 +15,12 @@ public class RoundRobin implements Scheduler {
 
     @Override
     public List<Process> schedule(List<Process> processes){
-        List<Process> allProcesses = new ArrayList<>(processes);
+        List<Process> allProcesses = new ArrayList<>();
+        for (Process p : processes){
+            Process copy = new Process(p.getPid(), p.getArrivalTime(), p.getBurstTime());
+            allProcesses.add(copy);
+        }
+
         List<Process> completedProcesses = new ArrayList<>();
         Queue<Process> queue = new LinkedList<>();
         Set<String> inQueue = new HashSet<>();
@@ -74,7 +79,7 @@ public class RoundRobin implements Scheduler {
             }
         }
 
-        return completedProcesses;
+        return allProcesses;
     }
     public List<Process> getExecutionOrder(){
         return executionOrder;
