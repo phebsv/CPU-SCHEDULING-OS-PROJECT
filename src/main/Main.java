@@ -1,6 +1,7 @@
 package main;
 import java.util.*;
 import schedulers.FCFS;
+import schedulers.MLFQ;
 import schedulers.RoundRobin;
 import schedulers.SJF;
 import schedulers.SRTF;
@@ -81,11 +82,20 @@ public class Main{
             List<Process> scheduled = scheduler.schedule(processes);
             
             System.out.println("Gantt Chart");
-            for (Process p : scheduled){
-                if (algoChoice==5){
-                    System.out.print("|" + p.getPid() + "(Q" + p.getQueueLevel() + ") ");
-                } else {
-                    System.out.print("| " + p.getPid()+" ");
+            if (algoChoice == 5 && scheduler instanceof MLFQ mlfqScheduler) {
+                List<MLFQ.GanttEntry> entries = mlfqScheduler.getGanttEntries();
+                for (MLFQ.GanttEntry entry : entries) {
+                    System.out.print("| " + entry.pid + "(Q" + entry.queueLevel + ") ");
+                }
+                System.out.println("|");
+
+                for (MLFQ.GanttEntry entry : entries) {
+                    System.out.print(entry.startTime + "      ");
+                }
+                System.out.println(entries.get(entries.size() - 1).endTime);
+            } else {
+                for (Process p : scheduled) {
+                    System.out.print("| " + p.getPid() + " ");
                 }
             }
             System.out.println("|");
