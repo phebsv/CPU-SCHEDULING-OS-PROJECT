@@ -87,7 +87,7 @@ public class Main{
 
                 if (entries.isEmpty()){
                     System.out.println("No Gantt Entries to display.");
-                }else{
+                } else{
                     System.out.println("|");
                     for (MLFQ.GanttEntry entry : entries) {
                         if(entry.queueLevel == -1){
@@ -95,14 +95,31 @@ public class Main{
                         } else {
                             System.out.print("| " + entry.pid + "(Q" + entry.queueLevel + ") ");
                         }
-                }
-                System.out.println();
+                    }
+                    System.out.println();
 
                 for (MLFQ.GanttEntry entry : entries) {
                     System.out.print(entry.startTime + "\t");
                 }
                 System.out.println(entries.get(entries.size() - 1).endTime);
-            }
+            } 
+        } else if (algoChoice == 4 && scheduler instanceof RoundRobin rrScheduler) {
+                List<Process> execOrder = rrScheduler.getExecutionOrder();
+
+                if (execOrder.isEmpty()) {
+                    System.out.println("No Gantt Entries to display.");
+                } else {
+                    System.out.println("|");
+                    for (Process p : execOrder) {
+                        System.out.print("| " + p.getPid() + " ");
+                    }
+                    System.out.println("|");
+
+                    for (Process p : execOrder) {
+                        System.out.print(p.getStartTime() + "\t");
+                    }
+                    System.out.println(execOrder.get(execOrder.size() - 1).getCompletionTime());
+            } 
         } else {
                 int currentTime = 0;
                 for (Process p : scheduled) {
@@ -132,6 +149,6 @@ public class Main{
 
         System.out.printf("Average Turnaround time: %.2f", totalTAT / scheduled.size());
         System.out.printf("Average Response Time: %.2f", totalRT / scheduled.size());
+        }
     }
-}
 }
