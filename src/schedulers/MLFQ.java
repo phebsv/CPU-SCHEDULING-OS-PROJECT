@@ -4,32 +4,31 @@ import main.Process;
 import main.Scheduler;
 
 public class MLFQ implements Scheduler {
-
-    public static class GanttEntry {
-    public String pid;
-    public int queueLevel;
-    public int startTime;
-    public int endTime;
-
-    public GanttEntry(String pid, int queueLevel, int startTime, int endTime) {
-        this.pid = pid;
-        this.queueLevel = queueLevel;
-        this.startTime = startTime;
-        this.endTime = endTime;
-    }
-}
-
     private final int[] timeQuantums;
     private final int[] allotmentTimes;
-    public List<GanttEntry> ganttEntries = new ArrayList<>();
-
-    public List<GanttEntry> getGanttEntries(){
-        return ganttEntries;
-    }
+    private final List<GanttEntry> ganttEntries = new ArrayList<>();
 
     public MLFQ(int[] timeQuantums, int[] allotmentTimes) {
         this.timeQuantums = timeQuantums;
         this.allotmentTimes = allotmentTimes;
+    }
+
+    public static class GanttEntry {
+        public String pid;
+        public int queueLevel;
+        public int startTime;
+        public int endTime;
+
+        public GanttEntry(String pid, int queueLevel, int startTime, int endTime) {
+            this.pid = pid;
+            this.queueLevel = queueLevel;
+            this.startTime = startTime;
+            this.endTime = endTime;
+    }
+}
+
+    public List<GanttEntry> getGanttEntries(){
+        return ganttEntries;
     }
 
     @Override
@@ -53,7 +52,6 @@ public class MLFQ implements Scheduler {
         Map<String, Integer> timeUsedAtLevel = new HashMap<>();
 
         allProcesses.sort(Comparator.comparingInt(Process::getArrivalTime));
-        ganttEntries.clear();
 
         while (completed < n) {
             for (Process p : allProcesses) {
@@ -125,9 +123,13 @@ public class MLFQ implements Scheduler {
             }
 
             if (!didRun) {
+                int idleStart = currentTime;
                 currentTime++;
+                ganttEntries.add(new GanttEntry("IDLE", -1, idleStart, currentTime));
             }
         }
+
+        ganttEntries.clear();
 
         return completedProcesses;
     }
