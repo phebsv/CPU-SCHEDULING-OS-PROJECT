@@ -79,8 +79,14 @@ public class RoundRobin implements Scheduler {
             }
         }
 
-        return allProcesses;
+        for (Process p : completedProcesses) {
+            p.setTurnaroundTime(p.getCompletionTime() - p.getArrivalTime());
+            p.setResponseTime(p.getStartTime() - p.getArrivalTime());
+        }
+
+        return completedProcesses;
     }
+    
     public List<Process> getExecutionOrder(){
         return executionOrder;
     }

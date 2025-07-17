@@ -6,6 +6,8 @@ public class Process {
     int burstTime;
     int remainingTime;
     int completionTime;
+    int turnaroundTime;
+    int responseTime;
     int startTime = -1;
     int queueLevel = -1;
 
@@ -38,6 +40,14 @@ public class Process {
         return queueLevel;
     }
 
+    public int getTurnaroundTime(){
+        return turnaroundTime;
+    }
+
+    public int getResponseTime(){
+        return responseTime;
+    }
+
     public void setRemainingTime(int remainingTime){
         this.remainingTime = remainingTime;
     }
@@ -53,12 +63,10 @@ public class Process {
     public void setQueueLevel(int level){
         this.queueLevel = level;
     }
-    
-    public int getTurnaroundTime(){
-        return completionTime - arrivalTime;
+    public void setTurnaroundTime(int turnaroundTime){
+        this.turnaroundTime = turnaroundTime;
     }
-
-    public int getResponseTime(){
-        return startTime - arrivalTime;
+    public void setResponseTime(int responseTime){
+        this.responseTime = responseTime;
     }
 }
