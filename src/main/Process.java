@@ -18,6 +18,19 @@ public class Process {
         this.remainingTime = burstTime;
     }
 
+    public Process(Process p) {
+        this.pid = p.pid;
+        this.arrivalTime = p.arrivalTime;
+        this.burstTime = p.burstTime;
+        this.remainingTime = p.remainingTime;
+        this.completionTime = p.completionTime;
+        this.startTime = p.startTime;
+        this.turnaroundTime = p.turnaroundTime;
+        this.responseTime = p.responseTime;
+        this.queueLevel = p.queueLevel;
+    }
+
+
     public String getPid(){ 
         return pid;
     }

@@ -103,24 +103,6 @@ public class Main{
                 }
                 System.out.println(entries.get(entries.size() - 1).endTime);
             }
-        } else if (algoChoice == 4 && scheduler instanceof RoundRobin rrScheduler) {
-                List<Process> execOrder = rrScheduler.getExecutionOrder();
-
-                if (execOrder.isEmpty()) {
-                    System.out.println("No execution to display.");
-                } else {
-                    int time = 0;
-                    for (Process p : execOrder) {
-                        System.out.print("| " + p.getPid() + " ");
-                    }
-                    System.out.println("|");
-
-                    System.out.print(execOrder.get(0).getStartTime());
-                    for (Process p : execOrder) {
-                        System.out.print("   " + p.getCompletionTime());
-                    }
-                    System.out.println();
-            }
         } else {
                 int currentTime = 0;
                 for (Process p : scheduled) {
@@ -148,8 +130,8 @@ public class Main{
             + p.getStartTime() + "\t" + p.getCompletionTime() + "\t" + tat + "\t" +rt);
         }
 
-        System.out.printf("Average Turnaround time: %.2f", totalTAT / scheduled.size());
-        System.out.printf("Average Response Time: %.2f", totalRT / scheduled.size());
+        System.out.printf("Average Turnaround time: %.2f\n", totalTAT / scheduled.size());
+        System.out.printf("Average Response Time: %.2f\n", totalRT / scheduled.size());
         }
     }
 }

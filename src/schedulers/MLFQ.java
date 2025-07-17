@@ -131,8 +131,6 @@ public class MLFQ implements Scheduler {
             }
         }
 
-        //ganttEntries.clear();
-
         return completedProcesses;
     }
 }
