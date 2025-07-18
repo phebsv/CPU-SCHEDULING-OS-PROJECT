@@ -17,18 +17,21 @@ import java.util.*;
 
 public class MainGUI extends Application {
 
+    // Declare all UI components as class fields
     private TextArea outputArea;
-    private TextField arrivalInput, burstInput, numInput, quantumInput;
+    private TextField arrivalInput, burstInput, numInput;
+    private TextField rrQuantumInput;
+    private TextField[] mlfqQuantumInputs = new TextField[4];
+    private TextField[] mlfqAllotmentInputs = new TextField[4];
+    private VBox rrBox, mlfqBox;
     private ComboBox<String> algorithmChoice;
     private ObservableList<Process> processes = FXCollections.observableArrayList();
     private TableView<Process> processTable;
-
     private Button addManualBtn, generateBtn, runBtn, clearBtn;
 
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("CPU Scheduling Simulator");
-       
 
         VBox root = new VBox(10);
         root.setPadding(new Insets(15));
@@ -39,23 +42,26 @@ public class MainGUI extends Application {
         root.getChildren().add(numBox);
 
         algorithmChoice = new ComboBox<>();
-        algorithmChoice.getItems().addAll("First Come First Serve (FCFS)", "Shortest Job First(SJF) Non-Preemptive", "Shortest Remaining Time(SRTF) Preemptive", "Round Robin (RR)", "Multilevel Feedback Queue(MLFQ)");
+        algorithmChoice.getItems().addAll(
+            "First Come First Serve (FCFS)", 
+            "Shortest Job First(SJF) Non-Preemptive", 
+            "Shortest Remaining Time(SRTF) Preemptive", 
+            "Round Robin (RR)", 
+            "Multilevel Feedback Queue(MLFQ)"
+        );
         algorithmChoice.setValue("SELECT AN ALGORITHM");
         algorithmChoice.setOnAction(e -> toggleQuantumField());
         root.getChildren().add(new HBox(10, new Label("Algorithm:"), algorithmChoice));
 
-        quantumInput = new TextField();
-        quantumInput.setPromptText("Enter Quantum");
-        HBox quantumBox = new HBox(10, new Label("Quantum (RR/MLFQ):"), quantumInput);
-        root.getChildren().add(quantumBox);
+        // Initialize Round Robin components
         rrQuantumInput = new TextField();
-        rrQuantumInput.setId("rrQuantumInput");
         rrQuantumInput.setPromptText("Quantum (e.g., 4)");
         rrQuantumInput.setPrefWidth(120);
         rrQuantumInput.setMaxWidth(120);
         rrBox = new VBox(5, new Label("Time Quantum (Round Robin):"), rrQuantumInput);
         rrBox.setVisible(false);
 
+        // Initialize MLFQ components
         GridPane mlfqGrid = new GridPane();
         mlfqGrid.setHgap(10);
         mlfqGrid.setVgap(5);
@@ -91,13 +97,19 @@ public class MainGUI extends Application {
         processTable = new TableView<>();
         processTable.setItems(processes);
         processTable.setPrefHeight(200);
+        
         TableColumn<Process, String> pidCol = new TableColumn<>("PID");
         pidCol.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getPid()));
+        
         TableColumn<Process, Integer> atCol = new TableColumn<>("Arrival");
         atCol.setCellValueFactory(p -> new SimpleIntegerProperty(p.getValue().getArrivalTime()).asObject());
+        
         TableColumn<Process, Integer> btCol = new TableColumn<>("Burst");
         btCol.setCellValueFactory(p -> new SimpleIntegerProperty(p.getValue().getBurstTime()).asObject());
-        processTable.getColumns().addAll(pidCol, atCol, btCol);
+        
+        @SuppressWarnings("unchecked")
+        TableColumn<Process, ?>[] columns = new TableColumn[] {pidCol, atCol, btCol};
+        processTable.getColumns().addAll(columns);
         root.getChildren().add(processTable);
 
         generateBtn = new Button("Generate Random");
@@ -108,7 +120,7 @@ public class MainGUI extends Application {
 
         clearBtn = new Button("Reset");
         clearBtn.setOnAction(e -> clearAll());
-        clearBtn.setDisable(true); // disabled until runScheduler is triggered
+        clearBtn.setDisable(true);
 
         HBox buttonBox = new HBox(10, generateBtn, runBtn, clearBtn);
         root.getChildren().add(buttonBox);
@@ -124,13 +136,15 @@ public class MainGUI extends Application {
         primaryStage.setMaximized(true);
         primaryStage.show();
 
-        toggleQuantumField(); // initial state
+        toggleQuantumField();
     }
 
     private void toggleQuantumField() {
         String algo = algorithmChoice.getValue();
-        boolean showQuantum = algo.equals("Round Robin (RR)") || algo.equals("Multilevel Feedback Queue(MLFQ)");
-        quantumInput.setDisable(!showQuantum);
+        if (algo == null) return;
+        
+        rrBox.setVisible(algo.equals("Round Robin (RR)"));
+        mlfqBox.setVisible(algo.equals("Multilevel Feedback Queue(MLFQ)"));
     }
 
     private void addManualProcess() {
@@ -182,7 +196,7 @@ public class MainGUI extends Application {
             case "Round Robin (RR)" -> {
                 int q;
                 try {
-                    q = Integer.parseInt(quantumInput.getText());
+                    q = Integer.parseInt(rrQuantumInput.getText());
                 } catch (Exception e) {
                     outputArea.appendText("Invalid quantum value.\n");
                     return;
@@ -190,8 +204,17 @@ public class MainGUI extends Application {
                 scheduler = new RoundRobin(q);
             }
             case "Multilevel Feedback Queue(MLFQ)" -> {
-                int[] tq = {2, 4, 8};
-                int[] at = {4, 8, 16};
+                int[] tq = new int[4];
+                int[] at = new int[4];
+                try {
+                    for (int i = 0; i < 4; i++) {
+                        tq[i] = Integer.parseInt(mlfqQuantumInputs[i].getText());
+                        at[i] = Integer.parseInt(mlfqAllotmentInputs[i].getText());
+                    }
+                } catch (Exception e) {
+                    outputArea.appendText("Invalid MLFQ parameters.\n");
+                    return;
+                }
                 scheduler = new MLFQ(tq, at);
             }
             default -> {
@@ -207,12 +230,11 @@ public class MainGUI extends Application {
         arrivalInput.setDisable(true);
         burstInput.setDisable(true);
         numInput.setDisable(true);
-        quantumInput.setDisable(true);
         algorithmChoice.setDisable(true);
         addManualBtn.setDisable(true);
         generateBtn.setDisable(true);
         runBtn.setDisable(true);
-        clearBtn.setDisable(false); // enable only reset
+        clearBtn.setDisable(false);
     }
 
     private void displayResults(List<Process> scheduled) {
@@ -255,7 +277,11 @@ public class MainGUI extends Application {
         arrivalInput.clear();
         burstInput.clear();
         numInput.clear();
-        quantumInput.clear();
+        rrQuantumInput.clear();
+        for (int i = 0; i < 4; i++) {
+            mlfqQuantumInputs[i].clear();
+            mlfqAllotmentInputs[i].clear();
+        }
         outputArea.clear();
 
         arrivalInput.setDisable(false);
