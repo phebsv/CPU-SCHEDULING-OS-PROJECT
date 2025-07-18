@@ -148,7 +148,7 @@ public class Main{
             + p.getStartTime() + "\t" + p.getCompletionTime() + "\t" + tat + "\t" +rt);
         }
 
-        System.out.printf("Average Turnaround time: %.2f", totalTAT / scheduled.size());
+        System.out.printf("Average Turnaround time: %.2f\n", totalTAT / scheduled.size());
         System.out.printf("Average Response Time: %.2f", totalRT / scheduled.size());
         }
     }

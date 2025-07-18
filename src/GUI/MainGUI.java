@@ -36,8 +36,8 @@ public class MainGUI extends Application {
         root.getChildren().add(numBox);
 
         algorithmChoice = new ComboBox<>();
-        algorithmChoice.getItems().addAll("FCFS", "SJF", "SRTF", "Round Robin", "MLFQ");
-        algorithmChoice.setValue("FCFS");
+        algorithmChoice.getItems().addAll("First Come First Serve (FCFS)", "Shortest Job First(SJF) Non-Preemptive", "Shortest Remaining Time(SRTF) Preemptive", "Round Robin (RR)", "Multilevel Feedback Queue(MLFQ)");
+        algorithmChoice.setValue("SELECT AN ALGORITHM");
         algorithmChoice.setOnAction(e -> toggleQuantumField());
         root.getChildren().add(new HBox(10, new Label("Algorithm:"), algorithmChoice));
 
@@ -99,7 +99,7 @@ public class MainGUI extends Application {
 
     private void toggleQuantumField() {
         String algo = algorithmChoice.getValue();
-        boolean showQuantum = algo.equals("Round Robin") || algo.equals("MLFQ");
+        boolean showQuantum = algo.equals("Round Robin (RR)") || algo.equals("Multilevel Feedback Queue(MLFQ)");
         quantumInput.setDisable(!showQuantum);
     }
 
@@ -146,10 +146,10 @@ public class MainGUI extends Application {
         Scheduler scheduler;
 
         switch (algo) {
-            case "FCFS" -> scheduler = new FCFS();
-            case "SJF" -> scheduler = new SJF();
-            case "SRTF" -> scheduler = new SRTF();
-            case "Round Robin" -> {
+            case "First Come First Serve (FCFS)" -> scheduler = new FCFS();
+            case "Shortest Job First(SJF) Non-Preemptive" -> scheduler = new SJF();
+            case "Shortest Remaining Time(SRTF) Preemptive" -> scheduler = new SRTF();
+            case "Round Robin (RR)" -> {
                 int q;
                 try {
                     q = Integer.parseInt(quantumInput.getText());
@@ -159,7 +159,7 @@ public class MainGUI extends Application {
                 }
                 scheduler = new RoundRobin(q);
             }
-            case "MLFQ" -> {
+            case "Multilevel Feedback Queue(MLFQ)" -> {
                 int[] tq = {2, 4, 8};
                 int[] at = {4, 8, 16};
                 scheduler = new MLFQ(tq, at);
@@ -190,12 +190,18 @@ public class MainGUI extends Application {
         double totalTAT = 0, totalRT = 0;
 
         for (Process p : scheduled) {
-            int tat = p.getTurnaroundTime();
-            int rt = p.getResponseTime();
-            totalTAT += tat;
-            totalRT += rt;
-            outputArea.appendText(p.getPid() + "\t" + p.getArrivalTime() + "\t" + p.getBurstTime() + "\t" +
-                    p.getStartTime() + "\t" + p.getCompletionTime() + "\t" + tat + "\t" + rt + "\n");
+             int at = p.getArrivalTime();
+        int bt = p.getBurstTime();
+        int st = p.getStartTime();
+        int ct = p.getCompletionTime();
+        int tat = ct - at;
+        int rt = st - at;
+            
+        totalTAT += tat;
+        totalRT += rt;
+
+        outputArea.appendText(p.getPid() + "\t" + at + "\t" + bt + "\t" +
+                st + "\t" + ct + "\t" + tat + "\t" + rt + "\n");
         }
 
         int n = scheduled.size();
