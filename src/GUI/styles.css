@@ -1,13 +1,14 @@
 .root {
-    -fx-background-color: #f5f7fa;
+    -fx-background-color: linear-gradient(to bottom, #eef1f5, #dbe4ec);
     -fx-padding: 20;
     -fx-font-family: "Segoe UI", sans-serif;
     -fx-font-size: 15px;
 }
 
 .label {
-    -fx-text-fill: #333;
+    -fx-text-fill: #2e3c4f;
     -fx-font-weight: bold;
+    -fx-font-size: 14px;
 }
 
 .text-field,
@@ -15,36 +16,72 @@
 .text-area {
     -fx-background-color: #ffffff;
     -fx-control-inner-background: #ffffff;
-    -fx-text-fill: #333333;
-    -fx-border-color: #cfcfcf;
-    -fx-border-radius: 5;
-    -fx-background-radius: 5;
-    -fx-padding: 6;
+    -fx-text-fill: #2e3c4f;
+    -fx-border-color: #b0bec5;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 6 10;
+}
+
+.combo-box .list-cell {
+    -fx-padding: 8;
 }
 
 .button {
-    -fx-background-color: #4a90e2;
+    -fx-background-color: linear-gradient(to right, #4a90e2, #357ABD);
     -fx-text-fill: white;
-    -fx-background-radius: 5;
+    -fx-background-radius: 8;
     -fx-font-weight: bold;
+    -fx-padding: 8 14;
+    -fx-font-size: 14px;
     -fx-cursor: hand;
     -fx-effect: dropshadow(two-pass-box, rgba(0,0,0,0.15), 2, 0, 1, 1);
+    -fx-border-color: transparent;
 }
 
 .button:hover {
-    -fx-background-color: #357ABD;
+    -fx-background-color: linear-gradient(to right, #2c6ed5, #1f55b5);
 }
 
 .table-view {
-    -fx-background-color: white;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #d0dce7;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-table-cell-border-color: #d9e2ec;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #d0dce7;
+    -fx-background-radius: 8 8 0 0;
+}
+
+.table-view .column-header, .table-view .filler {
+    -fx-size: 28;
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: #d9e2ec;
+    -fx-background-color: transparent;
+    -fx-text-fill: #2e3c4f;
+    -fx-font-weight: bold;
 }
 
 .table-row-cell {
-    -fx-background-color: white;
+    -fx-background-color: #ffffff;
     -fx-text-fill: #333;
+    -fx-border-color: #eef1f5;
 }
 
 .text-area {
     -fx-font-family: Consolas, monospace;
     -fx-font-size: 13px;
+    -fx-border-color: #b0bec5;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 10;
+}
+
+.hbox, .vbox {
+    -fx-spacing: 10;
+    -fx-padding: 6 0;
 }
