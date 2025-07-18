@@ -6,7 +6,6 @@ import schedulers.RoundRobin;
 import schedulers.SJF;
 import schedulers.SRTF;
 
-
 public class Main{
     public static void main(String[] args){
         try (Scanner scanner = new Scanner (System.in)) {
@@ -96,15 +95,31 @@ public class Main{
                             System.out.print("| " + entry.pid + "(Q" + entry.queueLevel + ") ");
                         }
                     }
-                    System.out.println();
+                    System.out.println("|");
 
-                for (MLFQ.GanttEntry entry : entries) {
-                    System.out.print(entry.startTime + "\t");
+                    for (MLFQ.GanttEntry entry : entries) {
+                        System.out.print(entry.startTime + "\t");
+                    }
+                    System.out.println(entries.get(entries.size() - 1).endTime);
                 }
-                System.out.println(entries.get(entries.size() - 1).endTime);
-            }
-        } else {
-                int currentTime = 0;
+            } else if (algoChoice == 3 && scheduler instanceof SRTF srtfScheduler) {
+                // Handle SRTF Gantt chart
+                List<SRTF.GanttEntry> entries = srtfScheduler.getGanttEntries();
+                
+                if (entries.isEmpty()) {
+                    System.out.println("No Gantt Entries to display.");
+                } else {
+                    for (SRTF.GanttEntry entry : entries) {
+                        System.out.print("| " + entry.pid + " ");
+                    }
+                    System.out.println("|");
+
+                    for (SRTF.GanttEntry entry : entries) {
+                        System.out.print(entry.startTime + "\t");
+                    }
+                    System.out.println(entries.get(entries.size() - 1).endTime);
+                }
+            } else {
                 for (Process p : scheduled) {
                     System.out.print("| " + p.getPid() + " ");
                 }
@@ -115,7 +130,6 @@ public class Main{
                 }
                 System.out.println(scheduled.get(scheduled.size() - 1).getCompletionTime());
             }
-
         System.out.println("Process\tAT\tBT\tST\tCT\tTAT\tRT");
         double totalTAT=0;
         double totalRT=0;

@@ -1,15 +1,15 @@
 package main;
 
 public class Process {
-    String pid;
-    int arrivalTime;
-    int burstTime;
-    int remainingTime;
-    int completionTime;
-    int turnaroundTime;
-    int responseTime;
-    int startTime = -1;
-    int queueLevel = -1;
+    public String pid;
+    public int arrivalTime;
+    public int burstTime;
+    public int remainingTime;
+    public int completionTime;
+    public int turnaroundTime;
+    public int responseTime;
+    public int startTime = -1;
+    public int queueLevel = -1;
 
     public Process(String pid, int arrivalTime, int burstTime){
         this.pid = pid;
