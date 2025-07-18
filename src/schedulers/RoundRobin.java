@@ -7,117 +7,90 @@ import main.Scheduler;
 public class RoundRobin implements Scheduler {
 
     private final int quantum;
+    private List<GanttEntry> ganttChart = new ArrayList<>();
 
+    public static class GanttEntry {
+        public String pid;
+        public int startTime;
+        public int endTime;
+        
+        public GanttEntry(String pid, int startTime, int endTime) {
+            this.pid = pid;
+            this.startTime = startTime;
+            this.endTime = endTime;
+        }
+    }
     public RoundRobin(int quantum) {
         this.quantum = quantum;
     }
 
     @Override
     public List<Process> schedule(List<Process> processes){
-        List<Process> allProcesses = new ArrayList<>(processes);
+        List<Process> allProcesses = new ArrayList<>();
+        for (Process p : processes) {
+            allProcesses.add(new Process(p.getPid(), p.getArrivalTime(), p.getBurstTime()));
+        }
+
         List<Process> completedProcesses = new ArrayList<>();
-        Queue<Process> queue = new LinkedList<>();
-        List<Process> executionOrder = new ArrayList<>();
+        Queue<Process> readyQueue = new LinkedList<>();
+        ganttChart.clear();
 
         int currentTime= 0;
         int completed = 0;
         int n = allProcesses.size();
-    public List<Process> schedule(List<Process> processes) {
-        List<Process> allProcesses = new ArrayList<>();
-        for (Process p : processes) {
-            Process copy = new Process(p.getPid(), p.getArrivalTime(), p.getBurstTime());
-            allProcesses.add(copy);
-        }
+        int processIndex=0;
 
         allProcesses.sort(Comparator.comparingInt(Process::getArrivalTime));
-        Queue<Process> readyQueue = new LinkedList<>();
-        int currentTime = 0, completed = 0;
-        Set<String> inQueue = new HashSet<>();
-        List<Process> completedProcesses = new ArrayList<>();
 
-        Set<String> inQueue = new HashSet<>();
-
-
-        while (completed<n) {
-        while (completed < allProcesses.size()) {
-            for (Process p : allProcesses) {
-                if (p.getArrivalTime() <= currentTime && p.getRemainingTime() > 0 && !inQueue.contains(p.getPid())) {
-                    readyQueue.offer(p);
-                    inQueue.add(p.getPid());
-                }
+        while (completed < n) {
+            while (processIndex < allProcesses.size() && 
+                allProcesses.get(processIndex).getArrivalTime() <= currentTime) {
+                readyQueue.offer(allProcesses.get(processIndex));
+                processIndex++;
             }
 
             if (readyQueue.isEmpty()) {
-                currentTime++;
+                if (processIndex < allProcesses.size()) {
+                    int nextArrival = allProcesses.get(processIndex).getArrivalTime();
+                    ganttChart.add(new GanttEntry("IDLE", currentTime, nextArrival));
+                    currentTime = nextArrival;
+                } else {
+                    currentTime++;
+                }
                 continue;
             }
 
-            Process current = readyQueue.poll();
-            inQueue.remove(current.getPid());
 
+            Process current = readyQueue.poll();
             if (current.getStartTime() == -1) {
                 current.setStartTime(currentTime);
             }
 
-            Process exec = new Process(current.getPid(), current.getArrivalTime(), current.getBurstTime());
-            exec.setStartTime(currentTime);
-            executionOrder.add(exec);
-            
-
             int executeTime = Math.min(quantum, current.getRemainingTime());
-            currentTime += executeTime;
+            int segmentStartTime = currentTime;
             current.setRemainingTime(current.getRemainingTime() - executeTime);
+            currentTime += executeTime;
 
-            if (current.getRemainingTime() == 0){
-
-            int timeSlice = Math.min(quantum, current.getRemainingTime());
-            int start = currentTime;
-            int end = currentTime + timeSlice;
-
-            Process execSegment = new Process(current.getPid(), current.getArrivalTime(), current.getBurstTime());
-            execSegment.setStartTime(start);
-            execSegment.setCompletionTime(end);
-            executionOrder.add(execSegment);
-
-            currentTime += timeSlice;
-            current.setRemainingTime(current.getRemainingTime() - timeSlice);
-
-            for (Process p : allProcesses) {
-                if (p.getArrivalTime() <= currentTime && p.getRemainingTime() > 0 && !inQueue.contains(p.getPid())) {
-                    readyQueue.offer(p);
-                    inQueue.add(p.getPid());
-                }
-            }
+            ganttChart.add(new GanttEntry(current.getPid(), segmentStartTime, currentTime));
 
             if (current.getRemainingTime() == 0) {
                 current.setCompletionTime(currentTime);
-                current.setTurnaroundTime(current.getCompletionTime() - current.getArrivalTime());
-                current.setResponseTime(current.getStartTime() - current.getArrivalTime());
                 completedProcesses.add(current);
                 completed++;
-            }else {
-                
-                for (Process p : allProcesses){
-                    if (p.getArrivalTime() <= currentTime && p.getRemainingTime() > 0 && !inQueue.contains(p.getPid())){
-                        queue.offer(p);
-                        inQueue.add(p.getPid());
-                    }
+            } else {
+                while (processIndex < allProcesses.size() && 
+                    allProcesses.get(processIndex).getArrivalTime() <= currentTime) {
+                    readyQueue.offer(allProcesses.get(processIndex));
+                    processIndex++;
                 }
 
-                queue.offer(current);
-
-            } else {
                 readyQueue.offer(current);
-                inQueue.add(current.getPid());
             }
         }
-
+        completedProcesses.sort(Comparator.comparing(Process::getPid));
         return completedProcesses;
-
-
     }
-
-    public List<Process> getExecutionOrder() {
-        return executionOrder;
+    public List<GanttEntry> getGanttEntries() {
+        return ganttChart;
     }
 }

@@ -119,6 +119,22 @@ public class Main{
                     }
                     System.out.println(entries.get(entries.size() - 1).endTime);
                 }
+            } else if (algoChoice == 4 && scheduler instanceof RoundRobin rrScheduler) {
+                List<RoundRobin.GanttEntry> entries = rrScheduler.getGanttEntries();
+                
+                if (entries.isEmpty()) {
+                    System.out.println("No Gantt Entries to display.");
+                } else {
+                    for (RoundRobin.GanttEntry entry : entries) {
+                        System.out.print("| " + entry.pid + " ");
+                    }
+                    System.out.println("|");
+
+                    for (RoundRobin.GanttEntry entry : entries) {
+                        System.out.print(entry.startTime + "\t");
+                    }
+                    System.out.println(entries.get(entries.size() - 1).endTime);
+                }
             } else {
                 for (Process p : scheduled) {
                     System.out.print("| " + p.getPid() + " ");
