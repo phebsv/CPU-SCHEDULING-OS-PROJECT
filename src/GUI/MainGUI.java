@@ -57,6 +57,7 @@ public class MainGUI extends Application {
         rrQuantumInput = new TextField();
         rrQuantumInput.setPromptText("Quantum (e.g., 4)");
         rrQuantumInput.setPrefWidth(120);
+        rrQuantumInput.setMaxWidth(120);
         rrBox = new VBox(5, new Label("Time Quantum (Round Robin):"), rrQuantumInput);
         rrBox.setVisible(false);
 
