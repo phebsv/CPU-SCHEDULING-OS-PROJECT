@@ -1,76 +1,50 @@
 .root {
-    -fx-background-color: #1e1e2f;
+    -fx-background-color: #f5f7fa;
     -fx-padding: 20;
     -fx-font-family: "Segoe UI", sans-serif;
     -fx-font-size: 15px;
 }
 
-/* Labels */
 .label {
-    -fx-text-fill: #dddddd;
+    -fx-text-fill: #333;
     -fx-font-weight: bold;
 }
 
-/* Input controls */
 .text-field,
 .combo-box,
 .text-area {
-    -fx-background-color: #2c2c3e;
-    -fx-control-inner-background: #2c2c3e;
-    -fx-text-fill: #ffffff;
-    -fx-border-color: #3a3a4d;
-    -fx-border-radius: 4;
-    -fx-background-radius: 4;
+    -fx-background-color: #ffffff;
+    -fx-control-inner-background: #ffffff;
+    -fx-text-fill: #333333;
+    -fx-border-color: #cfcfcf;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
     -fx-padding: 6;
 }
 
-/* Text area styling */
-.text-area {
-    -fx-pref-row-count: 18;
-    -fx-font-family: Consolas, monospace;
-    -fx-font-size: 13px;
-}
-
-/* Buttons */
 .button {
-    -fx-background-color: linear-gradient(to right, #4b6cb7, #182848);
+    -fx-background-color: #4a90e2;
     -fx-text-fill: white;
-    -fx-background-radius: 6;
-    -fx-border-radius: 6;
-    -fx-padding: 8 16;
+    -fx-background-radius: 5;
     -fx-font-weight: bold;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(two-pass-box, rgba(0,0,0,0.3), 3, 0, 1, 1);
+    -fx-effect: dropshadow(two-pass-box, rgba(0,0,0,0.15), 2, 0, 1, 1);
 }
 
 .button:hover {
-    -fx-background-color: linear-gradient(to right, #5f7fd3, #23345e);
+    -fx-background-color: #357ABD;
 }
 
-.button:pressed {
-    -fx-background-color: #3a4d7a;
+.table-view {
+    -fx-background-color: white;
 }
 
-/* ComboBox dropdown */
-.combo-box .list-cell {
-    -fx-text-fill: #ffffff;
-    -fx-background-color: #2c2c3e;
+.table-row-cell {
+    -fx-background-color: white;
+    -fx-text-fill: #333;
 }
 
-/* Tooltip styling (optional) */
-.tooltip {
-    -fx-background-color: #2c2c3e;
-    -fx-text-fill: #ffffff;
+.text-area {
+    -fx-font-family: Consolas, monospace;
     -fx-font-size: 13px;
-}
-
-/* Scrollbars */
-.scroll-bar:vertical, .scroll-bar:horizontal {
-    -fx-background-color: transparent;
-}
-
-.scroll-bar .thumb {
-    -fx-background-color: #4b6cb7;
-    -fx-background-insets: 0;
-    -fx-background-radius: 5;
 }
