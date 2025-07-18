@@ -23,6 +23,8 @@ public class MainGUI extends Application {
     private ObservableList<Process> processes = FXCollections.observableArrayList();
     private TableView<Process> processTable;
 
+    private Button addManualBtn, generateBtn, runBtn, clearBtn;
+
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("CPU Scheduling Simulator");
@@ -46,20 +48,18 @@ public class MainGUI extends Application {
         HBox quantumBox = new HBox(10, new Label("Quantum (RR/MLFQ):"), quantumInput);
         root.getChildren().add(quantumBox);
 
-        // Manual input fields
         arrivalInput = new TextField();
         arrivalInput.setPromptText("Arrival Time");
 
         burstInput = new TextField();
         burstInput.setPromptText("Burst Time");
 
-        Button addManualBtn = new Button("Add Process");
+        addManualBtn = new Button("Add Process");
         addManualBtn.setOnAction(e -> addManualProcess());
 
         HBox manualBox = new HBox(10, new Label("Manual Input:"), arrivalInput, burstInput, addManualBtn);
         root.getChildren().add(manualBox);
 
-        // TableView for processes
         processTable = new TableView<>();
         processTable.setItems(processes);
         processTable.setPrefHeight(200);
@@ -72,14 +72,15 @@ public class MainGUI extends Application {
         processTable.getColumns().addAll(pidCol, atCol, btCol);
         root.getChildren().add(processTable);
 
-        Button generateBtn = new Button("Generate Random");
+        generateBtn = new Button("Generate Random");
         generateBtn.setOnAction(e -> generateRandomProcesses());
 
-        Button runBtn = new Button("Run Scheduler");
+        runBtn = new Button("Run Scheduler");
         runBtn.setOnAction(e -> runScheduler());
 
-        Button clearBtn = new Button("Clear All");
+        clearBtn = new Button("Reset");
         clearBtn.setOnAction(e -> clearAll());
+        clearBtn.setDisable(true); // disabled until runScheduler is triggered
 
         HBox buttonBox = new HBox(10, generateBtn, runBtn, clearBtn);
         root.getChildren().add(buttonBox);
@@ -172,6 +173,17 @@ public class MainGUI extends Application {
 
         List<Process> scheduled = scheduler.schedule(new ArrayList<>(processes));
         displayResults(scheduled);
+
+        // Disable all except reset
+        arrivalInput.setDisable(true);
+        burstInput.setDisable(true);
+        numInput.setDisable(true);
+        quantumInput.setDisable(true);
+        algorithmChoice.setDisable(true);
+        addManualBtn.setDisable(true);
+        generateBtn.setDisable(true);
+        runBtn.setDisable(true);
+        clearBtn.setDisable(false); // enable only reset
     }
 
     private void displayResults(List<Process> scheduled) {
@@ -190,18 +202,18 @@ public class MainGUI extends Application {
         double totalTAT = 0, totalRT = 0;
 
         for (Process p : scheduled) {
-             int at = p.getArrivalTime();
-        int bt = p.getBurstTime();
-        int st = p.getStartTime();
-        int ct = p.getCompletionTime();
-        int tat = ct - at;
-        int rt = st - at;
-            
-        totalTAT += tat;
-        totalRT += rt;
+            int at = p.getArrivalTime();
+            int bt = p.getBurstTime();
+            int st = p.getStartTime();
+            int ct = p.getCompletionTime();
+            int tat = ct - at;
+            int rt = st - at;
 
-        outputArea.appendText(p.getPid() + "\t" + at + "\t" + bt + "\t" +
-                st + "\t" + ct + "\t" + tat + "\t" + rt + "\n");
+            totalTAT += tat;
+            totalRT += rt;
+
+            outputArea.appendText(p.getPid() + "\t" + at + "\t" + bt + "\t" +
+                    st + "\t" + ct + "\t" + tat + "\t" + rt + "\n");
         }
 
         int n = scheduled.size();
@@ -216,6 +228,17 @@ public class MainGUI extends Application {
         numInput.clear();
         quantumInput.clear();
         outputArea.clear();
+
+        arrivalInput.setDisable(false);
+        burstInput.setDisable(false);
+        numInput.setDisable(false);
+        algorithmChoice.setDisable(false);
+        addManualBtn.setDisable(false);
+        generateBtn.setDisable(false);
+        runBtn.setDisable(false);
+
+        toggleQuantumField();
+        clearBtn.setDisable(true);
     }
 
     public static void main(String[] args) {
