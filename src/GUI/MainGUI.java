@@ -28,6 +28,7 @@ public class MainGUI extends Application {
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("CPU Scheduling Simulator");
+       
 
         VBox root = new VBox(10);
         root.setPadding(new Insets(15));
@@ -47,6 +48,33 @@ public class MainGUI extends Application {
         quantumInput.setPromptText("Enter Quantum");
         HBox quantumBox = new HBox(10, new Label("Quantum (RR/MLFQ):"), quantumInput);
         root.getChildren().add(quantumBox);
+        rrQuantumInput = new TextField();
+        rrQuantumInput.setId("rrQuantumInput");
+        rrQuantumInput.setPromptText("Quantum (e.g., 4)");
+        rrQuantumInput.setPrefWidth(120);
+        rrQuantumInput.setMaxWidth(120);
+        rrBox = new VBox(5, new Label("Time Quantum (Round Robin):"), rrQuantumInput);
+        rrBox.setVisible(false);
+
+        GridPane mlfqGrid = new GridPane();
+        mlfqGrid.setHgap(10);
+        mlfqGrid.setVgap(5);
+        for (int i = 0; i < 4; i++) {
+            mlfqQuantumInputs[i] = new TextField();
+            mlfqQuantumInputs[i].setPromptText("Q" + i + " Quantum");
+
+            mlfqAllotmentInputs[i] = new TextField();
+            mlfqAllotmentInputs[i].setPromptText("Q" + i + " Allotment");
+
+            mlfqGrid.add(new Label("Q" + i + " Quantum:"), 0, i);
+            mlfqGrid.add(mlfqQuantumInputs[i], 1, i);
+            mlfqGrid.add(new Label("Allotment:"), 2, i);
+            mlfqGrid.add(mlfqAllotmentInputs[i], 3, i);
+        }
+        mlfqBox = new VBox(5, new Label("MLFQ Quantum & Allotments:"), mlfqGrid);
+        mlfqBox.setVisible(false);
+
+        root.getChildren().addAll(rrBox, mlfqBox);
 
         arrivalInput = new TextField();
         arrivalInput.setPromptText("Arrival Time");
@@ -93,6 +121,7 @@ public class MainGUI extends Application {
         Scene scene = new Scene(root, 900, 700);
         scene.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
         primaryStage.setScene(scene);
+        primaryStage.setMaximized(true);
         primaryStage.show();
 
         toggleQuantumField(); // initial state
