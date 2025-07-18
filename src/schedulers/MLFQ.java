@@ -121,12 +121,10 @@ public class MLFQ implements Scheduler {
                 }
             }
             if (!didRun) {
-                if (hasUncompletedProcesses(allProcesses, currentTime)) {
-                    int idleStart = currentTime;
-                    currentTime++;
-                    ganttEntries.add(new GanttEntry("IDLE", -1, idleStart, currentTime));
+                int idleStart = currentTime;
+                currentTime++;
+                ganttEntries.add(new GanttEntry("IDLE", -1, idleStart, currentTime));
             }
-        }
     }
         return completedProcesses;
     }
