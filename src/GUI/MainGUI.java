@@ -33,6 +33,7 @@ public class MainGUI extends Application {
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("CPU Scheduling Simulator");
+       
 
         VBox root = new VBox(10);
         root.setPadding(new Insets(15));
@@ -55,7 +56,10 @@ public class MainGUI extends Application {
         root.getChildren().add(new HBox(10, new Label("Algorithm:"), algorithmChoice));
 
         rrQuantumInput = new TextField();
+        rrQuantumInput.setId("rrQuantumInput");
         rrQuantumInput.setPromptText("Quantum (e.g., 4)");
+        rrQuantumInput.setPrefWidth(120);
+        rrQuantumInput.setMaxWidth(120);
         rrBox = new VBox(5, new Label("Time Quantum (Round Robin):"), rrQuantumInput);
         rrBox.setVisible(false);
 
@@ -130,6 +134,7 @@ public class MainGUI extends Application {
         Scene scene = new Scene(root, 950, 750);
         scene.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
         primaryStage.setScene(scene);
+        primaryStage.setMaximized(true);
         primaryStage.show();
 
         toggleQuantumFields();
