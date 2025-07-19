@@ -10,6 +10,7 @@ import javafx.animation.*;
 import javafx.util.Duration;
 import java.util.*;
 import main.Process;
+import javafx.scene.Node;
 
 public class ResultsPane extends VBox {
     private TextArea outputArea;
@@ -21,6 +22,18 @@ public class ResultsPane extends VBox {
     private List<Process> scheduledProcesses;
     private boolean isPlaying = false;
     private Button stepBtn, playBtn, pauseBtn;
+    private Map<String, Color> processColors = new HashMap<>();
+    private static final double BLOCK_WIDTH = 40.0;
+    private static final Color[] COLOR_PALETTE = {
+        Color.rgb(100, 149, 237), // Cornflower Blue
+        Color.rgb(220, 20, 60),   // Crimson
+        Color.rgb(46, 139, 87),    // Sea Green
+        Color.rgb(255, 215, 0),    // Gold
+        Color.rgb(147, 112, 219),  // Medium Purple
+        Color.rgb(70, 130, 180),   // Steel Blue
+        Color.rgb(255, 127, 80),   // Coral
+        Color.rgb(218, 112, 214)   // Orchid
+    };
 
     public ResultsPane() {
         super(15);
@@ -36,10 +49,19 @@ public class ResultsPane extends VBox {
         outputArea.setPrefWidth(1000);
         outputArea.setWrapText(true);
 
-        // Gantt Chart
-        ganttChart = new HBox(2);
+        // Gantt Chart Container
+        ganttChart = new HBox(0);
         ganttChart.setAlignment(Pos.CENTER_LEFT);
-        ganttChartPane = new ScrollPane(ganttChart);
+        
+        // Time markers container
+        HBox timeMarkers = new HBox();
+        timeMarkers.setAlignment(Pos.BOTTOM_LEFT);
+        
+        // Main container for chart and markers
+        VBox chartContainer = new VBox(5);
+        chartContainer.getChildren().addAll(ganttChart, timeMarkers);
+        
+        ganttChartPane = new ScrollPane(chartContainer);
         ganttChartPane.setFitToHeight(true);
         ganttChartPane.setPrefHeight(150);
         ganttChartPane.setStyle("-fx-background-color: #f0f0f0;");
@@ -47,25 +69,14 @@ public class ResultsPane extends VBox {
         // Animation Controls
         animationControls = new HBox(10);
         stepBtn = new Button("Step");
-        stepBtn.setOnAction(e -> stepAnimation());
-        stepBtn.setDisable(true);
-
         playBtn = new Button("Play");
-        playBtn.setOnAction(e -> playAnimation());
-        playBtn.setDisable(true);
-
         pauseBtn = new Button("Pause");
-        pauseBtn.setOnAction(e -> pauseAnimation());
-        pauseBtn.setDisable(true);
-
         animationControls.getChildren().addAll(stepBtn, playBtn, pauseBtn);
         animationControls.setAlignment(Pos.CENTER);
 
         getChildren().addAll(
-            new Label("Execution Details:"),
-            outputArea,
-            new Label("Gantt Chart Visualization:"),
-            ganttChartPane,
+            new Label("Execution Details:"), outputArea,
+            new Label("Gantt Chart Visualization:"), ganttChartPane,
             animationControls
         );
     }
@@ -122,48 +133,87 @@ public class ResultsPane extends VBox {
 
     public void createGanttChart(List<Process> scheduled) {
         ganttChart.getChildren().clear();
+        processColors.clear();
         
         if (scheduled.isEmpty()) return;
         
-        int maxTime = scheduled.stream()
-                .mapToInt(Process::getCompletionTime)
-                .max()
-                .orElse(0);
-        
-        // Calculate scale factor to fit the chart
-        double scale = 800.0 / (maxTime + 1);
-        
-        Process prevProcess = null;
+        // Assign colors from palette
+        int colorIndex = 0;
         for (Process p : scheduled) {
-            double width = (p.getCompletionTime() - p.getStartTime()) * scale;
-            Rectangle rect = new Rectangle(width, 30, getProcessColor(p.getPid()));
-            rect.setStroke(Color.BLACK);
+            if (!processColors.containsKey(p.getPid())) {
+                processColors.put(p.getPid(), COLOR_PALETTE[colorIndex % COLOR_PALETTE.length]);
+                colorIndex++;
+            }
+        }
+        
+        // Create timeline blocks
+        int maxTime = 0;
+        int prevEndTime = 0;
+        
+        for (Process p : scheduled) {
+            int start = p.getStartTime();
+            int end = p.getCompletionTime();
+            maxTime = Math.max(maxTime, end);
             
-            VBox box = new VBox();
-            box.getChildren().add(new Text(p.getPid()));
-            box.getChildren().add(rect);
-            box.setAlignment(Pos.CENTER);
+            // Add idle time if needed
+            if (start > prevEndTime) {
+                addIdleBlock(prevEndTime, start);
+            }
             
-            ganttChart.getChildren().add(box);
-            prevProcess = p;
+            // Add process block
+            addProcessBlock(p, start, end);
+            prevEndTime = end;
         }
         
         // Add time markers
-        HBox timeMarkers = new HBox();
-        timeMarkers.setAlignment(Pos.CENTER_LEFT);
-        for (int t = 0; t <= maxTime; t++) {
-            Text marker = new Text(String.valueOf(t));
-            HBox.setMargin(marker, new Insets(0, 0, 0, t == 0 ? 0 : scale - 10));
-            timeMarkers.getChildren().add(marker);
-        }
-        
-        VBox chartContainer = new VBox(10, ganttChart, timeMarkers);
-        ganttChartPane.setContent(chartContainer);
+        addTimeMarkers(maxTime);
     }
 
-    private Color getProcessColor(String pid) {
-        int hash = pid.hashCode();
-        return Color.hsb(hash % 360, 0.7, 0.9);
+    private void addProcessBlock(Process p, int start, int end) {
+        double width = (end - start) * BLOCK_WIDTH;
+        Rectangle rect = new Rectangle(width, 30, processColors.get(p.getPid()));
+        rect.setStroke(Color.BLACK);
+        rect.setStrokeWidth(1);
+        
+        VBox block = new VBox(
+            new Text(p.getPid()),
+            rect,
+            new Text(start + "-" + end)
+        );
+        block.setAlignment(Pos.CENTER);
+        block.setUserData(p);
+        block.getStyleClass().add("gantt-block");
+        
+        ganttChart.getChildren().add(block);
+    }
+
+    private void addIdleBlock(int start, int end) {
+        double width = (end - start) * BLOCK_WIDTH;
+        Rectangle rect = new Rectangle(width, 30, Color.LIGHTGRAY);
+        rect.setStroke(Color.BLACK);
+        rect.setStrokeWidth(1);
+        
+        VBox block = new VBox(
+            new Text("IDLE"),
+            rect,
+            new Text(start + "-" + end)
+        );
+        block.setAlignment(Pos.CENTER);
+        block.getStyleClass().add("gantt-idle-block");
+        
+        ganttChart.getChildren().add(block);
+    }
+
+    private void addTimeMarkers(int maxTime) {
+        HBox timeMarkers = (HBox) ((VBox)ganttChartPane.getContent()).getChildren().get(1);
+        timeMarkers.getChildren().clear();
+        
+        for (int t = 0; t <= maxTime; t++) {
+            Text marker = new Text(String.valueOf(t));
+            marker.getStyleClass().add("gantt-time-marker");
+            HBox.setMargin(marker, new Insets(0, 0, 0, t == 0 ? 0 : BLOCK_WIDTH - 10));
+            timeMarkers.getChildren().add(marker);
+        }
     }
 
     public void setupAnimation(List<Process> scheduled) {
@@ -192,10 +242,14 @@ public class ResultsPane extends VBox {
             isPlaying = false;
             playBtn.setDisable(false);
             pauseBtn.setDisable(true);
+            resetHighlighting();
         });
 
-        stepBtn.setDisable(false);
-        playBtn.setDisable(false);
+        stepBtn.setOnAction(e -> stepAnimation());
+        playBtn.setOnAction(e -> playAnimation());
+        pauseBtn.setOnAction(e -> pauseAnimation());
+        
+        enableControls(true);
     }
 
     private void updateAnimation(int time, List<Process> scheduled) {
@@ -205,29 +259,76 @@ public class ResultsPane extends VBox {
             .filter(p -> p.getStartTime() <= time && p.getCompletionTime() > time)
             .findFirst();
         
+        resetHighlighting();
+        
         if (activeProcess.isPresent()) {
             outputArea.appendText(activeProcess.get().getPid() + " is running\n");
-            highlightGanttBar(activeProcess.get().getPid());
+            highlightBlock(activeProcess.get(), true);
         } else {
             outputArea.appendText("CPU is idle\n");
+            highlightIdleBlock(time);
         }
         
         currentStep = time;
     }
 
-    private void highlightGanttBar(String pid) {
-        for (javafx.scene.Node node : ganttChart.getChildren()) {
+    private void highlightBlock(Process process, boolean highlight) {
+        for (Node node : ganttChart.getChildren()) {
             if (node instanceof VBox) {
-                VBox box = (VBox) node;
-                if (box.getChildren().get(0) instanceof Text) {
-                    Text text = (Text) box.getChildren().get(0);
-                    if (text.getText().equals(pid)) {
-                        Rectangle rect = (Rectangle) box.getChildren().get(1);
-                        rect.setFill(getProcessColor(pid).brighter());
+                VBox block = (VBox) node;
+                if (block.getUserData() != null && block.getUserData().equals(process)) {
+                    Rectangle rect = (Rectangle) block.getChildren().get(1);
+                    if (highlight) {
+                        rect.setFill(processColors.get(process.getPid()).brighter());
+                        rect.setStroke(Color.WHITE);
+                        rect.setStrokeWidth(2);
                     } else {
-                        Rectangle rect = (Rectangle) box.getChildren().get(1);
-                        rect.setFill(getProcessColor(text.getText()));
+                        rect.setFill(processColors.get(process.getPid()));
+                        rect.setStroke(Color.BLACK);
+                        rect.setStrokeWidth(1);
                     }
+                }
+            }
+        }
+    }
+
+    private void highlightIdleBlock(int time) {
+        for (Node node : ganttChart.getChildren()) {
+            if (node instanceof VBox) {
+                VBox block = (VBox) node;
+                if (block.getChildren().get(0) instanceof Text && 
+                    ((Text)block.getChildren().get(0)).getText().equals("IDLE")) {
+                    String[] times = ((Text)block.getChildren().get(2)).getText().split("-");
+                    int start = Integer.parseInt(times[0]);
+                    int end = Integer.parseInt(times[1]);
+                    
+                    if (time >= start && time < end) {
+                        Rectangle rect = (Rectangle) block.getChildren().get(1);
+                        rect.setFill(Color.DARKGRAY);
+                        rect.setStroke(Color.WHITE);
+                        rect.setStrokeWidth(2);
+                    }
+                }
+            }
+        }
+    }
+
+    private void resetHighlighting() {
+        for (Node node : ganttChart.getChildren()) {
+            if (node instanceof VBox) {
+                VBox block = (VBox) node;
+                if (block.getUserData() != null) {
+                    Process p = (Process) block.getUserData();
+                    Rectangle rect = (Rectangle) block.getChildren().get(1);
+                    rect.setFill(processColors.get(p.getPid()));
+                    rect.setStroke(Color.BLACK);
+                    rect.setStrokeWidth(1);
+                } else if (block.getChildren().get(0) instanceof Text && 
+                          ((Text)block.getChildren().get(0)).getText().equals("IDLE")) {
+                    Rectangle rect = (Rectangle) block.getChildren().get(1);
+                    rect.setFill(Color.LIGHTGRAY);
+                    rect.setStroke(Color.BLACK);
+                    rect.setStrokeWidth(1);
                 }
             }
         }
@@ -262,6 +363,6 @@ public class ResultsPane extends VBox {
     public void enableControls(boolean enabled) {
         stepBtn.setDisable(!enabled);
         playBtn.setDisable(!enabled);
-        pauseBtn.setDisable(!enabled);
+        pauseBtn.setDisable(!enabled || isPlaying);
     }
 }

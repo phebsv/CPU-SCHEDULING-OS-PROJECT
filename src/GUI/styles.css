@@ -127,3 +127,123 @@
     -fx-background-color: #2c2c2c;
     -fx-text-fill: #ffffff;
 }
+
+/* ========== GANTT CHART STYLES ========== */
+.gantt-block {
+    -fx-border-color: #444;
+    -fx-border-width: 1;
+    -fx-border-radius: 2;
+    -fx-background-radius: 2;
+}
+
+.gantt-process-label {
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+    -fx-text-fill: white;
+}
+
+.gantt-time-label {
+    -fx-font-size: 10px;
+    -fx-text-fill: #ccc;
+}
+
+.gantt-idle-block {
+    -fx-background-color: #3a3a3a;
+    -fx-border-color: #555;
+}
+
+.gantt-highlighted {
+    -fx-effect: dropshadow(gaussian, rgba(255,255,255,0.8), 10, 0.5, 0, 0);
+}
+
+.gantt-time-marker {
+    -fx-font-size: 10px;
+    -fx-text-fill: #aaa;
+}
+
+/* Animation Controls */
+.animation-control {
+    -fx-spacing: 10;
+    -fx-padding: 10;
+    -fx-background-color: #2a2a2a;
+    -fx-background-radius: 5;
+}
+
+.animation-button {
+    -fx-background-color: #3a3a3a;
+    -fx-text-fill: white;
+    -fx-min-width: 80px;
+}
+
+.animation-button:hover {
+    -fx-background-color: #4a4a4a;
+}
+
+.animation-button:disabled {
+    -fx-opacity: 0.7;
+}
+
+/* Process Block Colors */
+.process-p0 {
+    -fx-background-color: #3498db;
+}
+
+.process-p1 {
+    -fx-background-color: #e74c3c;
+}
+
+.process-p2 {
+    -fx-background-color: #2ecc71;
+}
+
+.process-p3 {
+    -fx-background-color: #f39c12;
+}
+
+.process-p4 {
+    -fx-background-color: #9b59b6;
+}
+
+.process-p5 {
+    -fx-background-color: #1abc9c;
+}
+
+.process-p6 {
+    -fx-background-color: #d35400;
+}
+
+.process-p7 {
+    -fx-background-color: #34495e;
+}
+
+/* Highlight States */
+.highlight-active {
+    -fx-background-color: derive(-fx-base, 50%);
+    -fx-border-color: #66aaff;
+    -fx-border-width: 2;
+}
+
+.highlight-idle {
+    -fx-background-color: #555555;
+    -fx-border-color: #777777;
+    -fx-border-width: 2;
+}
+
+/* Chart Container */
+.chart-container {
+    -fx-padding: 15;
+    -fx-background-color: #252525;
+    -fx-background-radius: 5;
+    -fx-border-color: #444;
+    -fx-border-radius: 5;
+}
+    
+/* Responsive Adjustments */
+@media (max-width: 800px) {
+    .gantt-process-label {
+        -fx-font-size: 9px;
+    }
+    .gantt-time-label {
+        -fx-font-size: 8px;
+    }
+}
