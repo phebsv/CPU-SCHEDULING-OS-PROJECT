@@ -26,6 +26,7 @@ public class ProcessController {
     private ResultsPane resultsPane;
     private MetricsPane metricsPane;
     private List<Process> lastScheduledProcesses;
+    private Scheduler scheduler;
 
     public ProcessController(ObservableList<Process> processes, 
                           ComboBox<String> algorithmChoice,
@@ -114,7 +115,7 @@ public class ProcessController {
         }
 
         try {
-            Scheduler scheduler = createScheduler();
+            scheduler = createScheduler();
             if (scheduler == null) return;
 
             lastScheduledProcesses = scheduler.schedule(new ArrayList<>(processes));
@@ -155,17 +156,26 @@ public class ProcessController {
     }
 
     private void displayResults(List<Process> scheduledProcesses) {
-        if (resultsPane != null) {
-            resultsPane.displayResults(scheduledProcesses);
+    if (resultsPane != null) {
+        resultsPane.displayResults(scheduledProcesses);
+        
+        if (algorithmChoice.getValue().equals("Round Robin (RR)") && 
+            scheduler instanceof RoundRobin rr) {
+            resultsPane.createRRGanttChart(rr.getGanttEntries());
+        } else if (algorithmChoice.getValue().equals("Shortest Remaining Time(SRTF) Preemptive")) {
+            resultsPane.createSRTFGanttChart(scheduledProcesses);
+        } else {
             resultsPane.createGanttChart(scheduledProcesses);
-            resultsPane.setupAnimation(scheduledProcesses);
-            resultsPane.enableControls(true);
         }
         
-        if (metricsPane != null) {
-            metricsPane.updateMetricsCharts(scheduledProcesses);
-        }
+        resultsPane.setupAnimation(scheduledProcesses);
+        resultsPane.enableControls(true);
     }
+    
+    if (metricsPane != null) {
+        metricsPane.updateMetricsCharts(scheduledProcesses);
+    }
+}
 
     public void clearAll(TextField... fields) {
         processes.clear();
@@ -178,10 +188,9 @@ public class ProcessController {
         
         if (resultsPane != null) {
             resultsPane.enableControls(false);
-            // Remove the clearResults() call since it doesn't exist
         }
         if (metricsPane != null) {
-            // Remove the clearCharts() call since it doesn't exist
+            metricsPane.clearCharts();
         }
     }
 
@@ -207,14 +216,12 @@ public class ProcessController {
 
         if (file != null) {
             try (PrintWriter writer = new PrintWriter(file)) {
-                // Header information
                 writer.println("CPU SCHEDULING RESULTS");
                 writer.println("======================");
                 writer.println("Algorithm: " + algorithmChoice.getValue());
                 writer.println("Generated at: " + new Date());
                 writer.println();
 
-                // Process details - using only available methods
                 writer.println("PROCESS DETAILS");
                 writer.println("PID\tArrival\tBurst");
                 for (Process p : processes) {
@@ -225,22 +232,32 @@ public class ProcessController {
                 }
                 writer.println();
 
-                // Simplified Gantt chart using only process IDs
                 writer.println("EXECUTION TIMELINE");
-                int currentTime = 0;
-                for (Process p : lastScheduledProcesses) {
-                    writer.printf("[%d-%d]\t%s%n", 
-                        currentTime, 
-                        currentTime + p.getBurstTime(), 
-                        p.getPid());
-                    currentTime += p.getBurstTime();
+                if (algorithmChoice.getValue().equals("Round Robin (RR)") && 
+                    scheduler instanceof RoundRobin rr) {
+                    for (RoundRobin.GanttEntry entry : rr.getGanttEntries()) {
+                        writer.printf("[%d-%d]\t%s%n", 
+                            entry.startTime, 
+                            entry.endTime, 
+                            entry.pid);
+                    }
+                } else {
+                    for (Process p : lastScheduledProcesses) {
+                        writer.printf("[%d-%d]\t%s%n", 
+                            p.getStartTime(), 
+                            p.getCompletionTime(), 
+                            p.getPid());
+                    }
                 }
                 writer.println();
 
-                // Basic metrics using only available data
                 writer.println("PERFORMANCE METRICS");
                 writer.printf("Total Processes: %d%n", processes.size());
-                writer.printf("Total Execution Time: %d units%n", currentTime);
+                writer.printf("Total Execution Time: %d units%n", 
+                    lastScheduledProcesses.stream()
+                        .mapToInt(Process::getCompletionTime)
+                        .max()
+                        .orElse(0));
 
                 showAlert("Export Successful", 
                     "Results successfully exported to:\n" + file.getAbsolutePath());

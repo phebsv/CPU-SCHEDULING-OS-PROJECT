@@ -88,4 +88,20 @@ public class MetricsPane extends VBox {
 
         timelineChart.getData().addAll(processSeries.values());
     }
+
+    public void clearCharts() {
+        // Clear all data series from both charts
+        metricsChart.getData().clear();
+        timelineChart.getData().clear();
+        
+        // Reset any other chart properties if needed
+        metricsChart.setTitle("Process Metrics");
+        timelineChart.setTitle("Process Execution Timeline");
+        
+        // Optionally reset axes if needed
+        ((CategoryAxis)metricsChart.getXAxis()).getCategories().clear();
+        ((NumberAxis)metricsChart.getYAxis()).setAutoRanging(true);
+        ((NumberAxis)timelineChart.getXAxis()).setAutoRanging(true);
+        ((NumberAxis)timelineChart.getYAxis()).setAutoRanging(true);
+    }
 }
