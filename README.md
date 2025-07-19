@@ -6,6 +6,14 @@ This project aims to create a simulation tool that visually demonstrates how var
 
 **HOW TO RUN THE SIMULATION**
 
+1. You can manually input or generate random processes depending on how many processes you want to input.
+2. Choose an algorithm scheduler.
+   NOTE: If you chose RR or MLFQ algorithm, you must first input a value for Quantum for RR and Quantum time and Allotment time for MLFQ.
+3. Run scheduler. It will direct you to the RESULT panel.
+4. You can press Play to show the execution details.
+5. You can also go to the Metrics panel for visualizing the Process Metrics and Process Execution Timeline.
+6. If you want to save the output, you can press export and it will save you a text file.
+
 **SCHEDULING ALGORITHMS IN THIS PROJECT**
 1. _First Come First Serve (FCFS)_ = Executes processes in the order they arrive, without preemption; simple but may lead to long waiting times for short jobs.
 2. _Shortest Job First (SJF - Non-Preemptive)_ = Runs the process with the shortest burst time first, minimizing average waiting time but requires prior knowledge of execution times.
@@ -14,6 +22,12 @@ This project aims to create a simulation tool that visually demonstrates how var
 5. _Multi-level Feedback Queue (MLFQ)_ =  Uses multiple priority queues with dynamic process promotion/demotion, balancing responsiveness and throughput for varied process types.
 
 **Screenshots**
+<img width="1495" height="871" alt="image" src="https://github.com/user-attachments/assets/b5a6d5db-d9c1-4c37-9f6d-110bb4c2b1fd" />
+<img width="1497" height="847" alt="image" src="https://github.com/user-attachments/assets/76873f2a-fbcc-4938-9f9c-a3a3b550c596" />
+<img width="1496" height="837" alt="image" src="https://github.com/user-attachments/assets/ccfefdd8-05c1-4f02-803f-22846d7c5844" />
+<img width="1495" height="858" alt="image" src="https://github.com/user-attachments/assets/8e6f62f3-861a-4be9-9172-761796335752" />
+<img width="1488" height="877" alt="image" src="https://github.com/user-attachments/assets/d1db2a26-97e3-4b3d-87e2-09d75b05794e" />
+
 
 **Sample Input and Output**
 1. FCFS
@@ -74,12 +88,16 @@ This project aims to create a simulation tool that visually demonstrates how var
 1. MLFQ Scheduling
    - Queue Demotion Timing Issue - Processes are not being demoted to lower priority queues at the correct time.
    - Queue Level Tracking Issue - The scheduler incorrectly tracks which queue processes belong to.
+2. Gantt Chart
+   - SRTF inaccurate gantt chart in GUI. However, terminal output shows the accurate gantt chart for the program.
+   - Some visualization of the Gantt Chart isn't aligned with the time.
 
 **Limitations**
 1. MLFQ implementation uses dynamic queue-based priorities only. Static process priorities are not supported
 
 **Incomplete Features**
 1. No boost time feature in MLFQ
+2. No context switch delay
 
 **Members and its' contribution**
 
