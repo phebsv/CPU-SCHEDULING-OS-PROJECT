@@ -156,26 +156,24 @@ public class ProcessController {
     }
 
     private void displayResults(List<Process> scheduledProcesses) {
-    if (resultsPane != null) {
-        resultsPane.displayResults(scheduledProcesses);
-        
-        if (algorithmChoice.getValue().equals("Round Robin (RR)") && 
-            scheduler instanceof RoundRobin rr) {
-            resultsPane.createRRGanttChart(rr.getGanttEntries());
-        } else if (algorithmChoice.getValue().equals("Shortest Remaining Time(SRTF) Preemptive")) {
-            resultsPane.createSRTFGanttChart(scheduledProcesses);
-        } else {
-            resultsPane.createGanttChart(scheduledProcesses);
+        if (resultsPane != null) {
+            resultsPane.displayResults(scheduledProcesses);
+            
+            if (algorithmChoice.getValue().equals("Round Robin (RR)") && 
+                scheduler instanceof RoundRobin rr) {
+                resultsPane.createRRGanttChart(rr.getGanttEntries());
+            } else {
+                resultsPane.createGanttChart(scheduledProcesses);
+            }
+            
+            resultsPane.setupAnimation(scheduledProcesses);
+            resultsPane.enableControls(true);
         }
         
-        resultsPane.setupAnimation(scheduledProcesses);
-        resultsPane.enableControls(true);
+        if (metricsPane != null) {
+            metricsPane.updateMetricsCharts(scheduledProcesses);
+        }
     }
-    
-    if (metricsPane != null) {
-        metricsPane.updateMetricsCharts(scheduledProcesses);
-    }
-}
 
     public void clearAll(TextField... fields) {
         processes.clear();

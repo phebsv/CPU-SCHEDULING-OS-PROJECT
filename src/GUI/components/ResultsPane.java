@@ -12,6 +12,7 @@ import java.util.*;
 import main.Process;
 import javafx.scene.Node;
 import schedulers.RoundRobin;
+import schedulers.SRTF;
 
 public class ResultsPane extends VBox {
     private TextArea outputArea;
@@ -202,34 +203,52 @@ public class ResultsPane extends VBox {
 
     private Color getProcessColor(String pid) {
         if (!processColors.containsKey(pid)) {
-            // Generate a color based on PID hash if not already assigned
             int hash = pid.hashCode();
             int index = Math.abs(hash) % COLOR_PALETTE.length;
             processColors.put(pid, COLOR_PALETTE[index]);
         }
         return processColors.get(pid);
     }
-    public void createSRTFGanttChart(List<Process> processes) {
-        ganttChart.getChildren().clear();
-        processColors.clear();
-        
-        // First assign colors to all processes
-        for (Process p : processes) {
-            getProcessColor(p.getPid()); // This will ensure color is assigned
+
+    
+    public void createSRTFGanttChart(List<SRTF.GanttEntry> entries) {
+    ganttChart.getChildren().clear();
+    processColors.clear();
+    
+    if (entries == null || entries.isEmpty()) return;
+    
+    // Assign colors to all processes
+    int colorIndex = 0;
+    for (SRTF.GanttEntry entry : entries) {
+        if (!entry.pid.equals("IDLE") && !processColors.containsKey(entry.pid)) {
+            processColors.put(entry.pid, COLOR_PALETTE[colorIndex % COLOR_PALETTE.length]);
+            colorIndex++;
         }
-        
-        // Then create the blocks
-        for (Process p : processes) {
-            addProcessBlock(p, p.getStartTime(), p.getCompletionTime());
-        }
-        
-        // Add time markers
-        int maxTime = processes.stream()
-            .mapToInt(Process::getCompletionTime)
-            .max()
-            .orElse(0);
-        addTimeMarkers(maxTime);
     }
+    
+    int maxTime = 0;
+    int prevEndTime = 0;
+    
+    for (SRTF.GanttEntry entry : entries) {
+        int start = entry.startTime;
+        int end = entry.endTime;
+        maxTime = Math.max(maxTime, end);
+        
+        if (start > prevEndTime) {
+            addIdleBlock(prevEndTime, start);
+        }
+        
+        if (entry.pid.equals("IDLE")) {
+            addIdleBlock(start, end);
+        } else {
+            addRRProcessBlock(entry.pid, start, end);
+        }
+        prevEndTime = end;
+    }
+    
+    addTimeMarkers(maxTime);
+}
+
 
     private void addProcessBlock(Process p, int start, int end) {
         double width = (end - start) * BLOCK_WIDTH;
