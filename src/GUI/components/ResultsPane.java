@@ -200,14 +200,35 @@ public class ResultsPane extends VBox {
         addTimeMarkers(maxTime);
     }
 
+    private Color getProcessColor(String pid) {
+        if (!processColors.containsKey(pid)) {
+            // Generate a color based on PID hash if not already assigned
+            int hash = pid.hashCode();
+            int index = Math.abs(hash) % COLOR_PALETTE.length;
+            processColors.put(pid, COLOR_PALETTE[index]);
+        }
+        return processColors.get(pid);
+    }
     public void createSRTFGanttChart(List<Process> processes) {
         ganttChart.getChildren().clear();
-        // For SRTF, we need to show the preemptions
-        // This assumes processes have been properly annotated with start/end times
-        // including preemption points
+        processColors.clear();
+        
+        // First assign colors to all processes
         for (Process p : processes) {
-            addGanttBlock(p.getPid(), p.getStartTime(), p.getCompletionTime(), getProcessColor(p.getPid()));
+            getProcessColor(p.getPid()); // This will ensure color is assigned
         }
+        
+        // Then create the blocks
+        for (Process p : processes) {
+            addProcessBlock(p, p.getStartTime(), p.getCompletionTime());
+        }
+        
+        // Add time markers
+        int maxTime = processes.stream()
+            .mapToInt(Process::getCompletionTime)
+            .max()
+            .orElse(0);
+        addTimeMarkers(maxTime);
     }
 
     private void addProcessBlock(Process p, int start, int end) {
