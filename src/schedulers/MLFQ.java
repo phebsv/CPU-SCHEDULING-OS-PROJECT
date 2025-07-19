@@ -45,107 +45,81 @@ public class MLFQ implements Scheduler {
         }
 
         int currentTime = 0;
-        int completed = 0;
-        int n = allProcesses.size();
-        Set<String> inQueue = new HashSet<>();
+        int totalProcesses = processes.size();
+        Map<String, Integer> timeUsedPerQueue = new HashMap<>();
+        Map<String, Integer> currentQueueLevel = new HashMap<>();
 
-        Map<String, Integer> timeUsedAtLevel = new HashMap<>();
+        for (Process p : processes) {
+            currentQueueLevel.put(p.getPid(), 0);
+            timeUsedPerQueue.put(p.getPid(), 0);
+        }
 
-        allProcesses.sort(Comparator.comparingInt(Process::getArrivalTime));
 
-        while (completed < n) {
-            checkAndAddNewArrivals(allProcesses, queues, inQueue, timeUsedAtLevel, currentTime);
-            boolean didRun = false;
+        while (completedProcesses.size() < totalProcesses) {
+            for (Process p : processes) {
+                if (p.getArrivalTime() <= currentTime &&
+                    p.getRemainingTime() > 0 &&
+                    !queues[currentQueueLevel.get(p.getPid())].contains(p)) {
+            
+                    if (!isInAnyQueue(queues, p)) {
+                        currentQueueLevel.put(p.getPid(), 0);
+                        timeUsedPerQueue.put(p.getPid(), 0);
+                    }
+            
+                    queues[0].add(p);
+                }
+            }
+
+
+            boolean executed = false;
 
             for (int level = 0; level < queues.length; level++) {
-                Queue<Process> queue = queues[level];
-
-                if (!queue.isEmpty()) {
-                    Process current = queue.poll();
-                    inQueue.remove(current.getPid());
-                    current.setQueueLevel(level);
-
+                if (!queues[level].isEmpty()) {
+                    Process current = queues[level].remove();
+                    executed = true;
+                    
                     if (current.getStartTime() == -1) {
                         current.setStartTime(currentTime);
                     }
 
+
                     int quantum = timeQuantums[level];
-                    int runTime = Math.min(quantum, current.getRemainingTime());
+                    int remainingTime = current.getRemainingTime();
+                    int timeToRun = Math.min(quantum, remainingTime);
 
-                    int startRunTime = currentTime;
-                    boolean preempted = false;
+                    ganttEntries.add(new GanttEntry(current.getPid(), level, currentTime, currentTime + timeToRun));
+                    current.setRemainingTime(remainingTime - timeToRun);
 
-                    for (int t = 0; t < runTime; t++) {
-                        currentTime++;
-                        current.setRemainingTime(current.getRemainingTime()-1);
-
-                        List<Process> newArrivals = checkAndAddNewArrivals(allProcesses, queues, inQueue, timeUsedAtLevel, currentTime);
-                        if (!newArrivals.isEmpty() && level > 0) {
-                            preempted = true;
-                            break;
-                        }
-
-                        if (current.getRemainingTime() == 0) {
-                            current.setCompletionTime(currentTime);
-                            completedProcesses.add(current);
-                            completed++;
-                            break;
-                        }
-                    }
-
-                    if (startRunTime < currentTime){
-                    ganttEntries.add(new GanttEntry(current.getPid(), level, startRunTime, currentTime));
-                    }
+                    int timeUsed = timeUsedPerQueue.get(current.getPid()) + timeToRun;
+                    timeUsedPerQueue.put(current.getPid(), timeUsed);
                     
-                    int actualRunTime = currentTime - startRunTime;
-                    int used = timeUsedAtLevel.getOrDefault(current.getPid(), 0);
-                    timeUsedAtLevel.put(current.getPid(), used + runTime);
+                    currentTime += timeToRun;
 
-                    if (current.getRemainingTime() > 0) {
-                        if (preempted) {
-                            queues[level].offer(current);
-                            inQueue.add(current.getPid());
-                        } else if (timeUsedAtLevel.get(current.getPid()) >= allotmentTimes[level] && level < queues.length - 1) {
-                            queues[level + 1].offer(current);
-                            inQueue.add(current.getPid());
-                            timeUsedAtLevel.put(current.getPid(), 0);
-                        } else {
-                            queues[level].offer(current);
-                            inQueue.add(current.getPid());
-                        }
+                    if (current.getRemainingTime() == 0) {
+                        current.setCompletionTime(currentTime);
+                        completedProcesses.add(current);
+                    } else if (timeUsed >= allotmentTimes[level] && level < queues.length - 1) {
+                        currentQueueLevel.put(current.getPid(), level + 1);
+                        timeUsedPerQueue.put(current.getPid(), 0);
+                        queues[level + 1].add(current);
+                    } else {
+                        queues[level].add(current);
                     }
-
-
-                    didRun = true;
                     break;
                 }
             }
-            if (!didRun) {
-                int idleStart = currentTime;
+        
+
+            if (!executed) {
                 currentTime++;
-                ganttEntries.add(new GanttEntry("IDLE", -1, idleStart, currentTime));
+                ganttEntries.add(new GanttEntry("IDLE", -1, currentTime - 1, currentTime));
             }
     }
         return completedProcesses;
     }
-    private List<Process> checkAndAddNewArrivals(List<Process> allProcesses, Queue<Process>[] queues, Set<String> inQueue, Map<String, Integer> timeUsedAtLevel, int currentTime) {
-        List<Process> newArrivals = new ArrayList<>();
-    
-        for (Process p : allProcesses) {
-            if (p.getArrivalTime() <= currentTime && p.getRemainingTime() > 0 && !inQueue.contains(p.getPid())) {
-                queues[0].offer(p);
-                inQueue.add(p.getPid());
-                timeUsedAtLevel.put(p.getPid(), 0);
-                newArrivals.add(p);
-            }
-        }
-        
-        return newArrivals;
-    }
-
-    private boolean hasUncompletedProcesses(List<Process> allProcesses, int currentTime) {
-        for (Process p : allProcesses) {
-            if (p.getRemainingTime() > 0 && p.getArrivalTime() <= currentTime) {
+    private boolean isInAnyQueue(Queue<Process>[] queues, Process p) {
+        for (Queue<Process> queue : queues) {
+            if (queue.contains(p)) {
                 return true;
             }
         }
