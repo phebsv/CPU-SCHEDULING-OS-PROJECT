@@ -71,22 +71,34 @@ This project aims to create a simulation tool that visually demonstrates how var
     P4      2       3       7       10      8       5
     Average Turnaround time: 5.50
     Average Response Time: 2.25
-5. MLFQ 
+5. MLFQ
     Input 4 Processes
     P1 - Arrival: 0, Burst: 8
     P2 - Arrival: 1, Burst: 6
     P3 - Arrival: 3, Burst: 4
     P4 - Arrival: 5, Burst: 2
-    Process AT      BT      ST      CT      TAT     RT
-    P4      5       2       10      12      7       5
-    P3      3       4       6       14      11      3
-    P1      0       8       0       18      18      0
-    P2      1       6       4       20      19      3
+    Q0 time quantum: 2
+    Q0 allotment time: 4
+    Q1 time quantum: 4
+    Q1 allotment time: 8
+    Q2 time quantum: 6
+    Q2 allotment time: 4
+    Q3 time quantum: 8
+    Q3 allotment time: 2
+    Output:
+    Process	AT	BT	ST	CT	TAT	RT
+    P1	    0	8	0	10	10	0
+    P2	    1	6	4	18	17	3
+    P3	    3	4	10	20	17	7
+    P4	    5	2	14	16	11	9
     Average Turnaround time: 13.75
-    Average Response Time: 2.75
+    Average Response Time: 4.75
 **Bugs**
 1. Queue Demotion Timing Issue - Processes are not being demoted to lower priority queues at the correct time.
 2. Queue Level Tracking Issue - The scheduler incorrectly tracks which queue processes belong to.
+
+**Limitations**
+1. MLFQ implementation uses dynamic queue-based priorities only. Static process priorities are not supported
 
 **Incomplete Features**
 1. No boost time feature in MLFQ
@@ -97,6 +109,7 @@ _Reiner Seldon C. Dela Cerna_
 - Shortest Job First (SJF) - Non-preemptive
 - Round Robin (RR)
 - Designed responsive GUI with JavaFX
+- Debug GUI
 
 _Phoebe Reese Carmel D. Villaflor_ 
 - First Come First Serve (FCFS)
