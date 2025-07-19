@@ -23,15 +23,9 @@ This project aims to create a simulation tool that visually demonstrates how var
     P3 - Arrival: 9, Burst: 4
     P4 - Arrival: 8, Burst: 4
 
-    Output:
-    Process AT      BT      ST      CT      TAT     RT
-    P2      1       4       1       5       4       0
-    P1      6       3       6       9       3       0
-    P4      8       4       9       13      5       1
-    P3      9       4       13      17      8       4
-    Average Turnaround time: 5.00
-    Average Response Time: 1.25
-2. SJF
+![6B8906E3-7323-4AF0-934B-5A643A64A850_4_5005_c](https://github.com/user-attachments/assets/db67da93-13b9-476a-9daf-dac335d5cbf3)
+
+3. SJF
     Input 3 processes
     P1 - Arrival: 5, Burst: 2
     P2 - Arrival: 2, Burst: 1
@@ -43,7 +37,7 @@ This project aims to create a simulation tool that visually demonstrates how var
     P3      7       1       7       8       1       0
     Average Turnaround time: 1.33
     Average Response Time: 0.00
-3. SRTF
+4. SRTF
     Input 4 processes
     P1 - Arrival: 9, Burst: 5
     P2 - Arrival: 3, Burst: 2
@@ -57,7 +51,7 @@ This project aims to create a simulation tool that visually demonstrates how var
     P3      9       5       15      20      11      6
     Average Turnaround time: 5.50
     Average Response Time: 1.75
-4. RR
+5. RR
     Input 4 processes
     P1 - Arrival: 9, Burst: 4
     P2 - Arrival: 1, Burst: 3
@@ -71,7 +65,7 @@ This project aims to create a simulation tool that visually demonstrates how var
     P4      2       3       7       10      8       5
     Average Turnaround time: 5.50
     Average Response Time: 2.25
-5. MLFQ
+6. MLFQ
     Input 4 Processes
     P1 - Arrival: 0, Burst: 8
     P2 - Arrival: 1, Burst: 6
