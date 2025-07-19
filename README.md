@@ -71,8 +71,9 @@ This project aims to create a simulation tool that visually demonstrates how var
 
 
 **Bugs**
-1. Queue Demotion Timing Issue - Processes are not being demoted to lower priority queues at the correct time.
-2. Queue Level Tracking Issue - The scheduler incorrectly tracks which queue processes belong to.
+1. MLFQ Scheduling
+   - Queue Demotion Timing Issue - Processes are not being demoted to lower priority queues at the correct time.
+   - Queue Level Tracking Issue - The scheduler incorrectly tracks which queue processes belong to.
 
 **Limitations**
 1. MLFQ implementation uses dynamic queue-based priorities only. Static process priorities are not supported
@@ -92,6 +93,6 @@ _Phoebe Reese Carmel D. Villaflor_
 - First Come First Serve (FCFS)
 - Shortest Remaining Time First (SRTF)
 - Multi-Level Feedback Queue (MLFQ)
-- Developed debug mode with step-through execution
-- Created test harness for algorithm verification
+- Debug Algorithms
+- Does run test for algorithm verification
 
