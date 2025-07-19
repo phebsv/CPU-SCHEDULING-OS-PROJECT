@@ -21,6 +21,8 @@ public class InputPane extends VBox {
     private final TableView<Process> processTable;
     private final ObservableList<Process> processes;
     private final ProcessController processController;
+    private final VBox rrBox;
+    private final VBox mlfqBox;
 
     public InputPane(TabPane tabPane, Tab resultsTab) {
         super(15);
@@ -36,14 +38,39 @@ public class InputPane extends VBox {
         this.burstInput = new TextField();
         this.numInput = new TextField();
         this.processTable = new TableView<>();
+        
+        // Initialize quantum containers
+        this.rrBox = new VBox(5, new Label("Round Robin Quantum:"), rrQuantumInput);
+        this.mlfqBox = new VBox(5, new Label("MLFQ Parameters:"), createMLFQGrid());
 
         createUI();
         
         this.processController = new ProcessController(
             processes, algorithmChoice, 
             rrQuantumInput, mlfqQuantumInputs, mlfqAllotmentInputs,
-            tabPane, resultsTab
+            tabPane, resultsTab, rrBox, mlfqBox
         );
+    }
+
+    private GridPane createMLFQGrid() {
+        GridPane mlfqGrid = new GridPane();
+        mlfqGrid.setHgap(10);
+        mlfqGrid.setVgap(5);
+        for (int i = 0; i < 4; i++) {
+            mlfqQuantumInputs[i] = new TextField(String.valueOf((i+1)*2));
+            mlfqQuantumInputs[i].setPromptText("Q" + i + " Quantum");
+            mlfqQuantumInputs[i].setPrefWidth(60);
+
+            mlfqAllotmentInputs[i] = new TextField(String.valueOf((i+1)*3));
+            mlfqAllotmentInputs[i].setPromptText("Q" + i + " Allotment");
+            mlfqAllotmentInputs[i].setPrefWidth(60);
+
+            mlfqGrid.add(new Label("Q" + i + ":"), 0, i);
+            mlfqGrid.add(mlfqQuantumInputs[i], 1, i);
+            mlfqGrid.add(new Label("Allot:"), 2, i);
+            mlfqGrid.add(mlfqAllotmentInputs[i], 3, i);
+        }
+        return mlfqGrid;
     }
 
     private void createUI() {
@@ -81,29 +108,11 @@ public class InputPane extends VBox {
         rrQuantumInput.setPromptText("Quantum");
         rrQuantumInput.setPrefWidth(120);
         rrQuantumInput.setMaxWidth(120);
-        VBox rrBox = new VBox(5, new Label("Round Robin Quantum:"), rrQuantumInput);
         rrBox.setVisible(false);
+        rrBox.managedProperty().bind(rrBox.visibleProperty());
 
-        // MLFQ inputs
-        GridPane mlfqGrid = new GridPane();
-        mlfqGrid.setHgap(10);
-        mlfqGrid.setVgap(5);
-        for (int i = 0; i < 4; i++) {
-            mlfqQuantumInputs[i] = new TextField(String.valueOf((i+1)*2));
-            mlfqQuantumInputs[i].setPromptText("Q" + i + " Quantum");
-            mlfqQuantumInputs[i].setPrefWidth(60);
-
-            mlfqAllotmentInputs[i] = new TextField(String.valueOf((i+1)*3));
-            mlfqAllotmentInputs[i].setPromptText("Q" + i + " Allotment");
-            mlfqAllotmentInputs[i].setPrefWidth(60);
-
-            mlfqGrid.add(new Label("Q" + i + ":"), 0, i);
-            mlfqGrid.add(mlfqQuantumInputs[i], 1, i);
-            mlfqGrid.add(new Label("Allot:"), 2, i);
-            mlfqGrid.add(mlfqAllotmentInputs[i], 3, i);
-        }
-        VBox mlfqBox = new VBox(5, new Label("MLFQ Parameters:"), mlfqGrid);
         mlfqBox.setVisible(false);
+        mlfqBox.managedProperty().bind(mlfqBox.visibleProperty());
 
         // Process Table
         processTable.setItems(processes);

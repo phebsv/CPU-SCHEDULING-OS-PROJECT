@@ -2,6 +2,7 @@ package GUI.controllers;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.scene.control.Alert.AlertType;
 import main.Process;
 import main.Scheduler;
@@ -17,6 +18,8 @@ public class ProcessController {
     private final TextField[] mlfqAllotmentInputs;
     private final TabPane tabPane;
     private final Tab resultsTab;
+    private final VBox rrBox;
+    private final VBox mlfqBox;
     private ResultsPane resultsPane;
     private MetricsPane metricsPane;
 
@@ -26,7 +29,9 @@ public class ProcessController {
                           TextField[] mlfqQuantumInputs,
                           TextField[] mlfqAllotmentInputs,
                           TabPane tabPane,
-                          Tab resultsTab) {
+                          Tab resultsTab,
+                          VBox rrBox,
+                          VBox mlfqBox) {
         this.processes = processes;
         this.algorithmChoice = algorithmChoice;
         this.rrQuantumInput = rrQuantumInput;
@@ -34,8 +39,35 @@ public class ProcessController {
         this.mlfqAllotmentInputs = mlfqAllotmentInputs;
         this.tabPane = tabPane;
         this.resultsTab = resultsTab;
+        this.rrBox = rrBox;
+        this.mlfqBox = mlfqBox;
     }
 
+    public void toggleQuantumField() {
+        String algo = algorithmChoice.getValue();
+        boolean showRR = "Round Robin (RR)".equals(algo);
+        boolean showMLFQ = "Multilevel Feedback Queue(MLFQ)".equals(algo);
+        
+        // Set visibility for containers
+        rrBox.setVisible(showRR);
+        mlfqBox.setVisible(showMLFQ);
+        
+        // Set visibility for individual fields (in case needed)
+        rrQuantumInput.setVisible(showRR);
+        rrQuantumInput.setManaged(showRR);
+        
+        for (TextField field : mlfqQuantumInputs) {
+            field.setVisible(showMLFQ);
+            field.setManaged(showMLFQ);
+        }
+        for (TextField field : mlfqAllotmentInputs) {
+            field.setVisible(showMLFQ);
+            field.setManaged(showMLFQ);
+        }
+    }
+
+    // ... (rest of the methods remain exactly the same as in your original file)
+    // Keep all other methods unchanged
     public void setResultsPane(ResultsPane resultsPane) {
         this.resultsPane = resultsPane;
     }
@@ -72,24 +104,6 @@ public class ProcessController {
             int at = rand.nextInt(10);
             int bt = rand.nextInt(10) + 1;
             processes.add(new Process("P" + (i + 1), at, bt));
-        }
-    }
-
-    public void toggleQuantumField() {
-        String algo = algorithmChoice.getValue();
-        boolean showRR = algo != null && algo.equals("Round Robin (RR)");
-        boolean showMLFQ = algo != null && algo.equals("Multilevel Feedback Queue(MLFQ)");
-        
-        rrQuantumInput.setVisible(showRR);
-        rrQuantumInput.setManaged(showRR);
-        
-        for (TextField field : mlfqQuantumInputs) {
-            field.setVisible(showMLFQ);
-            field.setManaged(showMLFQ);
-        }
-        for (TextField field : mlfqAllotmentInputs) {
-            field.setVisible(showMLFQ);
-            field.setManaged(showMLFQ);
         }
     }
 
@@ -167,7 +181,6 @@ public class ProcessController {
     }
 
     public void exportResults() {
-        // Implementation would go here
         showAlert("Export", "Export functionality would be implemented here");
     }
 
