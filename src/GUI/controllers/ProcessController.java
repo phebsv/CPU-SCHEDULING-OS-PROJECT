@@ -4,6 +4,9 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.Alert.AlertType;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import java.io.*;
 import main.Process;
 import main.Scheduler;
 import schedulers.*;
@@ -22,6 +25,7 @@ public class ProcessController {
     private final VBox mlfqBox;
     private ResultsPane resultsPane;
     private MetricsPane metricsPane;
+    private List<Process> lastScheduledProcesses;
 
     public ProcessController(ObservableList<Process> processes, 
                           ComboBox<String> algorithmChoice,
@@ -48,11 +52,9 @@ public class ProcessController {
         boolean showRR = "Round Robin (RR)".equals(algo);
         boolean showMLFQ = "Multilevel Feedback Queue(MLFQ)".equals(algo);
         
-        // Set visibility for containers
         rrBox.setVisible(showRR);
         mlfqBox.setVisible(showMLFQ);
         
-        // Set visibility for individual fields (in case needed)
         rrQuantumInput.setVisible(showRR);
         rrQuantumInput.setManaged(showRR);
         
@@ -66,8 +68,6 @@ public class ProcessController {
         }
     }
 
-    // ... (rest of the methods remain exactly the same as in your original file)
-    // Keep all other methods unchanged
     public void setResultsPane(ResultsPane resultsPane) {
         this.resultsPane = resultsPane;
     }
@@ -117,8 +117,8 @@ public class ProcessController {
             Scheduler scheduler = createScheduler();
             if (scheduler == null) return;
 
-            List<Process> scheduledProcesses = scheduler.schedule(new ArrayList<>(processes));
-            displayResults(scheduledProcesses);
+            lastScheduledProcesses = scheduler.schedule(new ArrayList<>(processes));
+            displayResults(lastScheduledProcesses);
             tabPane.getSelectionModel().select(resultsTab);
         } catch (NumberFormatException e) {
             showAlert("Invalid Input", "Please check all input fields for valid numbers.");
@@ -169,6 +169,7 @@ public class ProcessController {
 
     public void clearAll(TextField... fields) {
         processes.clear();
+        lastScheduledProcesses = null;
         for (TextField field : fields) {
             if (field != null) {
                 field.clear();
@@ -177,11 +178,77 @@ public class ProcessController {
         
         if (resultsPane != null) {
             resultsPane.enableControls(false);
+            // Remove the clearResults() call since it doesn't exist
+        }
+        if (metricsPane != null) {
+            // Remove the clearCharts() call since it doesn't exist
         }
     }
 
     public void exportResults() {
-        showAlert("Export", "Export functionality would be implemented here");
+        if (lastScheduledProcesses == null || lastScheduledProcesses.isEmpty()) {
+            showAlert("No Results", "Please run the scheduler first to generate results.");
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Export Scheduling Results");
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Text Files", "*.txt"),
+            new FileChooser.ExtensionFilter("CSV Files", "*.csv"),
+            new FileChooser.ExtensionFilter("All Files", "*.*")
+        );
+
+        fileChooser.setInitialFileName("cpu_scheduling_results_" + 
+            System.currentTimeMillis() + ".txt");
+
+        Stage stage = (Stage) tabPane.getScene().getWindow();
+        File file = fileChooser.showSaveDialog(stage);
+
+        if (file != null) {
+            try (PrintWriter writer = new PrintWriter(file)) {
+                // Header information
+                writer.println("CPU SCHEDULING RESULTS");
+                writer.println("======================");
+                writer.println("Algorithm: " + algorithmChoice.getValue());
+                writer.println("Generated at: " + new Date());
+                writer.println();
+
+                // Process details - using only available methods
+                writer.println("PROCESS DETAILS");
+                writer.println("PID\tArrival\tBurst");
+                for (Process p : processes) {
+                    writer.printf("%s\t%d\t%d%n",
+                        p.getPid(),
+                        p.getArrivalTime(),
+                        p.getBurstTime());
+                }
+                writer.println();
+
+                // Simplified Gantt chart using only process IDs
+                writer.println("EXECUTION TIMELINE");
+                int currentTime = 0;
+                for (Process p : lastScheduledProcesses) {
+                    writer.printf("[%d-%d]\t%s%n", 
+                        currentTime, 
+                        currentTime + p.getBurstTime(), 
+                        p.getPid());
+                    currentTime += p.getBurstTime();
+                }
+                writer.println();
+
+                // Basic metrics using only available data
+                writer.println("PERFORMANCE METRICS");
+                writer.printf("Total Processes: %d%n", processes.size());
+                writer.printf("Total Execution Time: %d units%n", currentTime);
+
+                showAlert("Export Successful", 
+                    "Results successfully exported to:\n" + file.getAbsolutePath());
+            } catch (IOException e) {
+                showAlert("Export Failed", 
+                    "Error exporting results:\n" + e.getMessage());
+            }
+        }
     }
 
     private void showAlert(String title, String message) {

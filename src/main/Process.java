@@ -61,6 +61,7 @@ public class Process {
         return responseTime;
     }
 
+
     public void setRemainingTime(int remainingTime){
         this.remainingTime = remainingTime;
     }
