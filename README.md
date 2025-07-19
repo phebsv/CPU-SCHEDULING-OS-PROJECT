@@ -7,11 +7,11 @@ This project aims to create a simulation tool that visually demonstrates how var
 **HOW TO RUN THE SIMULATION**
 
 **SCHEDULING ALGORITHMS IN THIS PROJECT**
-1. _First Come First Serve (FCFS)_ =
-2. _Shortest Job First (SJF - Non-Preemptive)_ =
-3. _Shortest Remaining Time First (SRTF - Pre-emptive)_ =
-4. _Round Robin (RR)_ =
-5. _Multi-level Feedback Queue (MLFQ)_ =
+1. _First Come First Serve (FCFS)_ = Executes processes in the order they arrive, without preemption; simple but may lead to long waiting times for short jobs.
+2. _Shortest Job First (SJF - Non-Preemptive)_ = Runs the process with the shortest burst time first, minimizing average waiting time but requires prior knowledge of execution times.
+3. _Shortest Remaining Time First (SRTF - Pre-emptive)_ = Preemptive version of SJF, where the scheduler always picks the job closest to completion, improving response times.
+4. _Round Robin (RR)_ = Assigns fixed time slices (quantum) to each process in cyclic order, ensuring fair CPU allocation but may increase overhead with short quanta.
+5. _Multi-level Feedback Queue (MLFQ)_ =  Uses multiple priority queues with dynamic process promotion/demotion, balancing responsiveness and throughput for varied process types.
 
 **Screenshots**
 
@@ -25,38 +25,29 @@ This project aims to create a simulation tool that visually demonstrates how var
 
 ![6B8906E3-7323-4AF0-934B-5A643A64A850_4_5005_c](https://github.com/user-attachments/assets/db67da93-13b9-476a-9daf-dac335d5cbf3)
 
-3. SJF
+2. SJF
     Input 3 processes
     P1 - Arrival: 5, Burst: 2
     P2 - Arrival: 2, Burst: 1
     P3 - Arrival: 7, Burst: 1
-    Output:
-    Process AT      BT      ST      CT      TAT     RT
-    P2      2       1       2       3       1       0
-    P1      5       2       5       7       2       0
-    P3      7       1       7       8       1       0
-    Average Turnaround time: 1.33
-    Average Response Time: 0.00
-4. SRTF
+   
+      
+3. SRTF
     Input 4 processes
     P1 - Arrival: 9, Burst: 5
     P2 - Arrival: 3, Burst: 2
     P3 - Arrival: 9, Burst: 5
     P4 - Arrival: 7, Burst: 3
-    Output:
-    Process AT      BT      ST      CT      TAT     RT
-    P2      3       2       3       5       2       0
-    P4      7       3       7       10      3       0
-    P1      9       5       10      15      6       1
-    P3      9       5       15      20      11      6
-    Average Turnaround time: 5.50
-    Average Response Time: 1.75
-5. RR
+   
+   
+   
+4. RR
     Input 4 processes
     P1 - Arrival: 9, Burst: 4
     P2 - Arrival: 1, Burst: 3
     P3 - Arrival: 1, Burst: 3
     P4 - Arrival: 2, Burst: 3
+   
     Output:
     Process AT      BT      ST      CT      TAT     RT
     P1      9       4       10      14      5       1
@@ -65,7 +56,8 @@ This project aims to create a simulation tool that visually demonstrates how var
     P4      2       3       7       10      8       5
     Average Turnaround time: 5.50
     Average Response Time: 2.25
-6. MLFQ
+   
+5. MLFQ
     Input 4 Processes
     P1 - Arrival: 0, Burst: 8
     P2 - Arrival: 1, Burst: 6
