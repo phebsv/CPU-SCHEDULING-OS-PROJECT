@@ -30,7 +30,8 @@ This project aims to create a simulation tool that visually demonstrates how var
     P1 - Arrival: 5, Burst: 2
     P2 - Arrival: 2, Burst: 1
     P3 - Arrival: 7, Burst: 1
-   
+![E73F2D39-919F-4B27-96A6-0DD63EFAB83C_4_5005_c](https://github.com/user-attachments/assets/98a71265-2275-474c-a2c0-df8cc3f008f5)
+
       
 3. SRTF
     Input 4 processes
@@ -39,7 +40,8 @@ This project aims to create a simulation tool that visually demonstrates how var
     P3 - Arrival: 9, Burst: 5
     P4 - Arrival: 7, Burst: 3
    
-   
+![06D2564D-9F8F-4593-91E6-6280C04BA15E_4_5005_c](https://github.com/user-attachments/assets/6ff2e01e-da21-4fbe-9dcd-4bcad9ccbbea)
+
    
 4. RR
     Input 4 processes
@@ -48,14 +50,7 @@ This project aims to create a simulation tool that visually demonstrates how var
     P3 - Arrival: 1, Burst: 3
     P4 - Arrival: 2, Burst: 3
    
-    Output:
-    Process AT      BT      ST      CT      TAT     RT
-    P1      9       4       10      14      5       1
-    P2      1       3       1       4       3       0
-    P3      1       3       4       7       6       3
-    P4      2       3       7       10      8       5
-    Average Turnaround time: 5.50
-    Average Response Time: 2.25
+![542A9E7B-4D5A-4230-97A0-D55C6B912933_4_5005_c](https://github.com/user-attachments/assets/880c2cc9-17d5-4744-bacf-326899868f01)
    
 5. MLFQ
     Input 4 Processes
@@ -71,14 +66,10 @@ This project aims to create a simulation tool that visually demonstrates how var
     Q2 allotment time: 4
     Q3 time quantum: 8
     Q3 allotment time: 2
-    Output:
-    Process	AT	BT	ST	CT	TAT	RT
-    P1	    0	8	0	10	10	0
-    P2	    1	6	4	18	17	3
-    P3	    3	4	10	20	17	7
-    P4	    5	2	14	16	11	9
-    Average Turnaround time: 13.75
-    Average Response Time: 4.75
+
+![EDDA2017-F483-45D5-9658-564017539AAD_4_5005_c](https://github.com/user-attachments/assets/067bf8e1-a72d-456f-920b-2f945acaf211)
+
+
 **Bugs**
 1. Queue Demotion Timing Issue - Processes are not being demoted to lower priority queues at the correct time.
 2. Queue Level Tracking Issue - The scheduler incorrectly tracks which queue processes belong to.
